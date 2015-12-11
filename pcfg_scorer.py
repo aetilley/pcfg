@@ -52,29 +52,32 @@ class PCFGScorer:
         return sentence.split()
     
     def score(self, sentence):
-        
-        tokens = self.tokenize(sentence):
+        print("Tokenizing...")
+        tokens = self.tokenize(sentence)
+        print("Applying inside algorithm to tokens")
         return self.inside(tokens)
 
     def inside(self, tokens):
 
         N = len(tokens)
-        
+        print("Number of tokens is ", N)
         nonterminals = set(self.nonterminal_counts.keys())
-        unary_rules = set(self.unary_rules_counts.keys())
-        binary_rules = set(self.binary_rules_counts.keys())
+        unary_rules = set(self.unary_rule_counts.keys())
+        binary_rules = set(self.binary_rule_counts.keys())
         
         pi = dict()
         
         #Initialization
-        
+        print("Initializing atomic pi values...")
         for i in range(N):
             for X in nonterminals:
                 if (X, tokens[i]) in unary_rules:
+                    
                     pi[(i, i, X)] = self.q_unary(X, tokens[i])
+                
                 else:
                     pi[(i, i, X)] = 0
-                    
+        #        print("pi(",i,",",i,",",X,") is ", pi[(i, i, X)])
         #Recursive Step
 
         for l in range(N-1):
@@ -85,8 +88,8 @@ class PCFGScorer:
                     for (X, Y, Z) in binary_rules:
                         for s in range(i, j):
                             sum += self.q_binary(X, Y, Z) * pi[i, s, Y] * pi[s+1, j, Z]
-                pi(i, j, X) = sum
-        return pi[1,N,'S']
+                pi[(i, j, X)] = sum
+        return pi[0,N-1,'S']
 
         
 
