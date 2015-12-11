@@ -1,0 +1,15 @@
+"""
+Probabilistic Context-Free Grammar Scorer
+"""
+
+
+def read_counts(counts_file):
+        """
+    Read frequency counts from a file and return an iterator yields 
+    each entity as a list. 
+    """
+
+
+                            for line in fi:
+                                        fields = line.strip().split(' ')
+                                                yield fields # yields a list of field
