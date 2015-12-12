@@ -1,4 +1,4 @@
-from pcfg_scorer import PCFGScorerProbabilistic Context Free Grammar Scorer inspired by Yu Usami's PCFG parser (https://github.com/usami/pcfg).
+Probabilistic Context Free Grammar Scorer inspired by Yu Usami's PCFG parser (https://github.com/usami/pcfg).
 
 Basic Usage:
 
