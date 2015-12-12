@@ -70,10 +70,11 @@ class PCFGScorer:
         #Initialization
         print("Initializing atomic pi values...")
         for i in range(N):
+            terminal = tokens[i]
             for X in nonterminals:
-                if (X, tokens[i]) in unary_rules:
+                if (X, terminal) in unary_rules:
                     
-                    pi[(i, i, X)] = self.q_unary(X, tokens[i])
+                    pi[(i, i, X)] = self.q_unary(X, terminal)
                 
                 else:
                     pi[(i, i, X)] = 0
@@ -81,15 +82,21 @@ class PCFGScorer:
         #Recursive Step
 
         for l in range(N-1):
-            for i in range(N-l):
-                j = i + l
-                for X in nonterminals:
+            for i in range(N-l-1):
+                j = i + l + 1
+                for X_0 in nonterminals:
                     sum = 0
-                    for (X, Y, Z) in binary_rules:
-                        for s in range(i, j):
-                            sum += self.q_binary(X, Y, Z) * pi[i, s, Y] * pi[s+1, j, Z]
-                pi[(i, j, X)] = sum
-        return pi[0,N-1,'S']
+                    print("Now computing pi", i, j, X_0, "...")
+                    for s in range(i, j):
+                        for (X, Y, Z) in binary_rules:
+                            if X == X_0:
+                                sum += self.q_binary(X, Y, Z) * pi[i, s, Y] * pi[s+1, j, Z]
+                    pi[(i, j, X_0)] = sum
+                    print("pi",i,j,X,":  ", sum)
+        
+        result = pi[0,N-1,'S']
+        print("Final Score:  ", result)
+        return result
 
         
 
