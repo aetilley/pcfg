@@ -1,8 +1,9 @@
-Probabilistic Context Free Grammar Scorer inspired by Yu Usami's PCFG parser (https://github.com/usami/pcfg).
+Probabilistic Context Free Grammar object inspired by Yu Usami's PCFG parser (https://github.com/usami/pcfg).
 
 Basic Usage:
 
->  from pcfg_scorer import PCFGScorer
->  scorer = PCFGScorer()
->  scorer.train("counts_file.txt")
->  scorer.score("I like water") #Note, no punctuation yet.
+>  from pcfg import PCFG
+>  grammar = PCFG()
+>  grammar.train("counts_file.txt")
+>  grammar.score("I cited her")
+>  grammar.parse("I cited her")

@@ -4,7 +4,7 @@ except ImportError:
     from distutils.core import setup
 
 config = {
-    'description': 'An implementation a basic PCFG scorer in Python',
+    'description': 'An implementation a basic PCFG parser/scorer in Python',
     'author': 'Arthur Tilley',
     'url': 'https://github.com/aetilley/pcfg',
     'author_email': 'aetilley@gmail.com',
