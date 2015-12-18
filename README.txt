@@ -1,4 +1,4 @@
-Probabilistic Context Free Grammar object inspired by Yu Usami's PCFG parser (https://github.com/usami/pcfg).
+Probabilistic Context Free Grammar parser/scorer object inspired by Yu Usami's PCFG parser (https://github.com/usami/pcfg).
 
 Basic Usage:
 
