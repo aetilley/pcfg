@@ -1,12 +1,8 @@
-"""
-Probabilistic Context-Free Grammar parser/scorer
-"""
+"""Probabilistic Context-Free Grammar parser/scorer."""
 
 
 def read_counts(counts_file):
-    """
-    Read frequency counts from a file
-    """
+    """Read frequency counts from a file."""
     fi = open(counts_file, 'r')
     for line in fi:
         fields = line.strip().split(' ')
@@ -14,7 +10,7 @@ def read_counts(counts_file):
 
 
 class PCFG:
-    
+    """The PCFG Grammar object."""    
     def __init__(self):
         self.nonterminal_counts = dict()
         self.unary_rule_counts = dict()
@@ -25,7 +21,7 @@ class PCFG:
         self.terminals = set()
 
 
-    def train(self, counts_file):
+    def train(self, counts_file, c_file_style = 0):
         """
         Read counts from a counts file, then store counts for each type:
         nonterminal, binary rule and unary rule.
@@ -48,7 +44,8 @@ class PCFG:
 
     def check_tokens(self, tokens):
         """
-        Checks whether each token is in the learned vocabulary (terminals) of the PCFG
+        Checks whether each token is in the learned
+        vocabulary (terminals) of the PCFG.
         """
         
         good = True
@@ -65,13 +62,12 @@ class PCFG:
         return self.binary_rule_counts[x, y, z] / self.nonterminal_counts[x]
 
     def tokenize(self, sentence):
-        #Note:  This default tokenizer doesn't deal with punctuation
-        """
-        Should return list.
-        """
+
+        """The lexer/tokenizer."""
         return sentence.split()
     
     def score(self, sentence):
+        """Score a sentence with respect to the trained grammar."""
         tokens = self.tokenize(sentence)
         self.check_tokens(tokens)
         print("Applying Inside algorithm...")
@@ -102,7 +98,8 @@ class PCFG:
                     for s in range(i, j):
                         for (X, Y, Z) in self.binary_rules:
                             if X == X_0:
-                                sum += self.q_binary(X, Y, Z) * pi[i, s, Y] * pi[s+1, j, Z]
+                                sum += self.q_binary(X, Y, Z) \*
+                                pi[i, s, Y] * pi[s+1, j, Z]
                     pi[(i, j, X_0)] = sum
         
         result = pi[0,N-1,'S']
@@ -159,6 +156,7 @@ class PCFG:
         return self.recover_tree(bp, tokens, 0, N-1, 'S')
 
     def recover_tree(self, bp, tokens, i, j, X):
+        """Recover a parse tree from a dictionary of back-pointers."""
         tree = dict()
         tree['tag'] = X
         if i == j:
