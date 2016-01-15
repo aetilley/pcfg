@@ -1,5 +1,5 @@
 
-START_CODE = "S"
+START_SYMBOL_CODE = "S"
 
 """Probabilistic Context-Free Grammar parser/scorer."""
 
@@ -38,7 +38,7 @@ class Symbol:
         return hash(str(self.symbol_code))
 
 class Rule:
-    """A rule for any CFG"""
+    """Any transformation (rewrite) rule for any CFG"""
 
     def __init__(self, source, targets):
         #Source and each of args should be Symbols
@@ -235,7 +235,7 @@ class PCFG:
                                        pi[i, s, Y] * pi[s+1, j, Z]
                     pi[(i, j, X_0)] = sum
         
-        result = pi[0,N-1, Symbol(START_CODE)]
+        result = pi[0,N-1, Symbol(START_SYMBOL_CODE)]
         print("Final Score:  ", result)
         return result
 
@@ -253,8 +253,8 @@ class PCFG:
         for i in range(N):
             terminal = symbols[i]
             for X in self.nonterminals:
-                if Rule(X, terminal) in self.unary_rules():
-                    pi[(i, i, X)] = self.q(Rule(X, terminal))
+                if Rule(X, (terminal,)) in self.unary_rules():
+                    pi[(i, i, X)] = self.q(Rule(X, (terminal,)))
                 else:
                     pi[(i, i, X)] = 0
 
@@ -266,21 +266,27 @@ class PCFG:
                     max_score = 0
                     best_rule = None
                     best_cut = 0
+
                     for s in range(i, j):
                         for rule in self.binary_rules():
-                            X = rule.source
-                            Y, Z = rule.targets
+                            X = rule.source()
+                            Y, Z = rule.targets()
                             if X == X_0:
-                                current_score = self.q(Rule(X, Y, Z)) * \
-                                pi[i, s, Y] * pi[s+1, j, Z]
+                                q_val = self.q(rule)
+                                v1 = pi[i, s, Y]
+                                v2 = pi[s+1, j, Z]
+                                #print("q_val is ", q_val, " v1 is ", v1, " v2 is ", v2)
+                                current_score = q_val * v1 * v2
+                                #print(current_score)
                                 if current_score > max_score:
                                     max_score = current_score
-                                    best_rule = Rule(X, Y, Z)
+                                    best_rule = Rule(X, (Y, Z))
+                                    #print("Best rule is now", best_rule)
                                     best_cut = s
                     pi[(i, j, X_0)] = max_score
                     bp[(i, j, X_0)] = (best_rule, best_cut)
         
-        return self.recover_tree(bp, tokens, 0, N-1, 'S')
+        return self.recover_tree(bp, symbols, 0, N-1, Symbol(START_SYMBOL_CODE))
 
     def recover_tree(self, bp, tokens, i, j, X):
         """Recover a parse tree from a dictionary of back-pointers."""
@@ -290,6 +296,8 @@ class PCFG:
             tree['terminal'] = tokens[i]
         else:
             rule, cut = bp[i, j, X]
-            tree['left_branch'] = self.recover_tree(bp, tokens, i, cut, rule[1])
-            tree['right_branch'] = self.recover_tree(bp, tokens, cut+1, j, rule[2])
+            print("Rule is ", rule, " and cut is ", cut)
+            left, right = rule.targets()
+            tree['left_branch'] = self.recover_tree(bp, tokens, i, cut, left )
+            tree['right_branch'] = self.recover_tree(bp, tokens, cut+1, j, right)
         return tree

@@ -4,6 +4,6 @@ Basic Usage:
 
 >  from pcfg import PCFG
 >  grammar = PCFG()
->  grammar.train("counts_file.txt")
+>  grammar.train_from_file("data/typed_counts_file_0.txt")
 >  grammar.score("I cited her")
 >  grammar.parse("I cited her")
