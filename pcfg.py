@@ -13,7 +13,7 @@ def read_lines(training_file_path):
 
 class Symbol:
     
-    # Could change this class to account for lexing (eg. "10" -> <decnumeral>
+    # Could change this class to account for lexing (eg. "17" -> <decnumeral>
     
     def __init__(self, code = "",  from_string = "", terminal = False):
         
@@ -81,7 +81,7 @@ class PCFG:
         #Set of nonterminal Symbols
         self.nonterminals = nonterminals
 
-        #A dict of items with keys aritys and as values sets of *tuples for rules* of the key's arity.
+        #A dict of items with keys aritys and as values sets of *rules* of the key's arity.
         self._n_ary_rules = n_ary_rules
         #A map from  *tuples for rules* to q values
         self._q = q
@@ -90,21 +90,23 @@ class PCFG:
 
     def get_rules_of_arity(self, n):
         """Return the set of rules of arity n"""
-        return {Rule(x[0], x[1:]) for x in self._n_ary_rules[n]}
+        if n not in self._n_ary_rules.keys():
+            return {}
+        return self._n_ary_rules[n]
 
     def set_rule(self, rule):
         n = rule.arity()
         if n not in self._n_ary_rules.keys():
-            self._n_ary_rules[n] = {rule.as_tuple()}
+            self._n_ary_rules[n] = {rule}
         else:
-            self._n_ary_rules[n].add(rule.as_tuple())
+            self._n_ary_rules[n].add(rule)
             
     def set_q(self, rule, q):
         """Set the parameter value for a given rule."""
-        self._q[rule.as_tuple()] = q
+        self._q[rule] = q
             
     def q(self, rule):
-        return self._q[rule.as_tuple()]
+        return self._q[rule]
 
     def unary_rules(self):
         return self.get_rules_of_arity(1)
@@ -212,8 +214,7 @@ class PCFG:
         for i in range(N):
             terminal = symbols[i]
             for X in self.nonterminals:
-                
-                if (X, terminal) in self.unary_rules():
+                if Rule(X, (terminal,)) in self.unary_rules():
                     
                     pi[(i, i, X)] = self.q(Rule(X, (terminal,)))
                 
