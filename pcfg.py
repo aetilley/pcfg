@@ -23,13 +23,13 @@ class Symbol:
         self.symbol_code = code #Eg. "NUMERAL"
         if from_string:
             self.symbol_code = string #Just for now
-        
-    def is_terminal(self):
-        return self._terminal
 
     def __str__(self):
         return self.symbol_code
     
+    def __repr__(self):
+        return self.symbol_code
+
     def __eq__(self, other):
         return self.symbol_code == other.symbol_code
 
