@@ -33,12 +33,11 @@ class Symbol:
     def __eq__(self, other):
         return self.symbol_code == other.symbol_code
 
-
     def __hash__(self):
         return hash(str(self.symbol_code))
 
 class Rule:
-    """Any transformation (rewrite) rule for any CFG"""
+    """A transformation (rewrite) rule for any CFG"""
 
     def __init__(self, source, targets):
         #Source and each of args should be Symbols
@@ -48,37 +47,35 @@ class Rule:
         self._targets = targets
 
     def source(self):
+        """returns source symbol (Nonterminal symbol being transformed by the grammar.)"""
         return self._source
 
     def arity(self):
+        """Return number of target symbols."""
         return len(self._targets)
 
     def targets(self):
+        """ Return tuple of target symbols """
         return self._targets
 
-    def as_tuple(self):
-        assert type(self._source) is Symbol
-        assert type(self._targets) is tuple
-        
-        return (self._source,) + self._targets
 
     def __str__(self):
         return self.source.__str__() + " " + self._targets.__str__()
-    
+
     def __eq__(self, other):
         return self._source == other._source and self._targets == other._targets
-    
+
     def __hash__(self):
         return hash((self._source, self._targets))
 
-                 
-    
+    """
+    def as_tuple(self):
+        assert type(self._source) is Symbol
+        assert type(self._targets) is tuplerule frequencies.  
+        """
 class PCFG:
-    """The PCFG Grammar object.
 
-    """    
     def __init__(self, terminals = set(), nonterminals = set(), n_ary_rules = dict(), q = dict()):
-
         #Set of terminal Symbols
         self.terminals = terminals
         #Set of nonterminal Symbols
@@ -86,7 +83,7 @@ class PCFG:
 
         #A dict of items with keys aritys and as values sets of *rules* of the key's arity.
         self._n_ary_rules = n_ary_rules
-        #A map from  *tuples for rules* to q values
+        #A map from  * rules* to q values
         self._q = q
 
         self.CNF = False
@@ -117,22 +114,27 @@ class PCFG:
     def binary_rules(self):
         return self.get_rules_of_arity(2)
         
-    def train_from_file(self, file_path, file_type = "TYPED_COUNTS_FILE"):
+    def train_from_file(self, file_path, file_type = "CNF_COUNTS"):
         """
-        Read counts from a counts file, then store counts for each type:
-        nonterminal, binary rule and unary rule.
+        This function is meant to act an a variety of data file formats in order to
 
+        1)  Learn the Symbols set (self.nonterminals and self.terminals) AND
+        2)  Compute the transition rule set (for self.get_rules_of_arity(<arity>))
+        3)  Compute the q parameter for each transition rule (for self.q(<rule>)
 
-        file_type = "TYPED_COUNTS_FILE" means the file contains lines of the form <count> <type> <args> where 
+        File Types:
 
+        file_type = "CNF_COUNTS" means the file contains lines of the form <count> <type> <args> where 
         <type> is "NONTERMINAL", "UNARYRULE", or "BINARYRULE"
         <args> are the corresponding one, two, or three Symbols, respectively.
         <count> is some given empirical count for this Symbol (for NONTERMINAL) 
         or for this  transformation (for *ARYRULE)
         Assumes all "NONTERMINAL" come first.
+
+        File types to support:  NCNF_COUNTS, CNF_PARAMS
         """
 
-        if file_type == "TYPED_COUNTS_FILE":
+        if file_type == "CNF_COUNTS":
             #We'll collect counts of 
             nonterminal_counts = dict()
             
@@ -162,20 +164,7 @@ class PCFG:
             pass
         else:
             pass
-    """
-    def check_tokens(self, tokens):
-        
-        Checks whether each token is in the learned
-        vocabulary (terminals) of the PCFG.
-        
-        
-        good = True
-        for token in tokens:
-            if token not in self.terminals:
-                good = False
-                print("The token ", token, " is not a known terminal.")
-        return good
-    """
+
     def check_terminals(self, symbols):
         return True #Change this
 
@@ -188,13 +177,16 @@ class PCFG:
             yield new_symbol
     
     def score(self, sentence, algorithm = "inside"):
-            """Score a sentence with respect to the trained grammar."""
-            symbols = list(self.get_symbols(sentence))
-            assert self.check_terminals(symbols)
-            if algorithm == "inside":
-                assert self.CNF, "This PCFG is not in Chomsky Normal Form.  Cannot apply inside algorithm."
-                print("Applying Inside algorithm...")
-                return self.inside(symbols)
+        """Score a sentence with respect to the trained grammar."""
+        symbols = list(self.get_symbols(sentence))
+        assert self.check_terminals(symbols)
+        if algorithm == "inside":
+            assert self.CNF, "This PCFG is not in Chomsky Normal Form.  Cannot apply inside algorithm."
+            print("Applying Inside algorithm...")
+            return self.inside(symbols)
+        else:
+            print("Algorithm not known")
+            quit()
 
 
     def parse(self, sentence, algorithm = "CKY"):
@@ -207,7 +199,10 @@ class PCFG:
             assert self.CNF, "This PCFG is not in Chomsky Normal Form.  Cannot apply inside algorithm."
             print("Applying CKY algorithm...")
             return self.CKY(symbols)
-
+        else:
+            print("Algorithm not known")
+            quit()
+            
     def inside(self, symbols):
 
         N = len(symbols)
@@ -217,8 +212,8 @@ class PCFG:
         for i in range(N):
             terminal = symbols[i]
             for X in self.nonterminals:
+                
                 if Rule(X, (terminal,)) in self.unary_rules():
-                    
                     pi[(i, i, X)] = self.q(Rule(X, (terminal,)))
                 
                 else:
