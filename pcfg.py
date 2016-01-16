@@ -27,7 +27,7 @@ class Symbol:
     def is_terminal(self):
         return self._terminal
 
-    def to_str(self):
+    def __str__(self):
         return self.symbol_code
     
     def __eq__(self, other):
@@ -61,6 +61,9 @@ class Rule:
         assert type(self._targets) is tuple
         
         return (self._source,) + self._targets
+
+    def __str__(self):
+        return self.source.__str__() + " " + self._targets.__str__()
     
     def __eq__(self, other):
         return self._source == other._source and self._targets == other._targets
@@ -276,29 +279,26 @@ class PCFG:
                                 q_val = self.q(rule)
                                 v1 = pi[i, s, Y]
                                 v2 = pi[s+1, j, Z]
-                                #print("q_val is ", q_val, " v1 is ", v1, " v2 is ", v2)
                                 current_score = q_val * v1 * v2
-                                #print(current_score)
                                 if current_score > max_score:
                                     max_score = current_score
                                     best_rule = Rule(X, (Y, Z))
-                                    #print("Best rule is now", best_rule)
                                     best_cut = s
                     pi[(i, j, X_0)] = max_score
                     bp[(i, j, X_0)] = (best_rule, best_cut)
         
         return self.recover_tree(bp, symbols, 0, N-1, Symbol(START_SYMBOL_CODE))
 
-    def recover_tree(self, bp, tokens, i, j, X):
+    def recover_tree(self, bp, symbols, i, j, X):
         """Recover a parse tree from a dictionary of back-pointers."""
         tree = dict()
         tree['tag'] = X
         if i == j:
-            tree['terminal'] = tokens[i]
+            tree['terminal'] = symbols[i]
         else:
             rule, cut = bp[i, j, X]
-            print("Rule is ", rule, " and cut is ", cut)
             left, right = rule.targets()
-            tree['left_branch'] = self.recover_tree(bp, tokens, i, cut, left )
-            tree['right_branch'] = self.recover_tree(bp, tokens, cut+1, j, right)
+            tree['left_branch'] = self.recover_tree(bp, symbols, i, cut, left )
+            tree['right_branch'] = self.recover_tree(bp, symbols, cut+1, j, right)
         return tree
+    
