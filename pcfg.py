@@ -1,4 +1,4 @@
-
+TOLERANCE = .00000000000001
 START_SYMBOL_CODE = "S"
 
 """Probabilistic Context-Free Grammar parser/scorer."""
@@ -13,9 +13,8 @@ def read_lines(training_file_path):
 
 class Symbol:
     
-    def __init__(self, symbol_code = ""):
-        
-        self._symbol_code = symbol_code #Eg. "NUMERAL"
+    def __init__(self):
+        self._symbol_code = None
 
     def __str__(self):
         return self._symbol_code
@@ -33,20 +32,19 @@ class Symbol:
 class Variable(Symbol):
     """(The class of Nonterminal Symbols)"""
     def __init__(self, var_code = ""):
-        
         self._symbol_code = var_code #For Now
 
 
 
 class Terminal(Symbol):
-        def __init__(self, term_code = "", from_string = ""):
-            if from_string != "":
+        def __init__(self, term_code = None, from_string = None):
+            if from_string:
                 self._symbol_code = from_string
-            elif term_code != "":
+            elif term_code:
                 self._symbol_code = term_code #For now
             else:
-                print('Valid form:  Terminal(term_code = "", from_string = "")')
-    
+                print('Valid form:  Terminal(term_code) | Terminal(from_string)')
+                
 
 class Rule:
     """A transformation (rewrite) rule for any CFG"""
@@ -66,7 +64,7 @@ class Rule:
         
         assert type(self._source) is Variable, "The source must be of type Variable."
         for target in self._targets:
-            assert isinstance(target,  Symbol),  "All targets must be of type Symbol."
+            assert isinstance(target,  Symbol),  "All targets must be instances of type Symbol."
             
     def source(self):
         """returns source symbol (Variable symbol being transformed by the grammar.)"""
@@ -93,85 +91,115 @@ class CFG():
 
     def __init__(self, terminals = set(), variables = set(),
                  rules_of_arity = dict(), start_symbol = Variable(START_SYMBOL_CODE)):
+        self._Trained = False
+        self._CNF = False
+        self.start_symbol = start_symbol
         #Set of terminal Symbols
         self.terminals = terminals
         #Set of nonterminal Symbols
         self.variables = variables
-        #A dict of items with keys aritys and as values sets of *rules* of the key's arity.
+        #A dict of items with keys aritys and as values *sets* of *rules* of the key's arity.
         self._n_ary_rules = rules_of_arity
-        self.start_symbol = start_symbol
-        self.check_CFG()
-                 
+        """ another dict where the indices are source Variables, 
+        and again, values are corresponding *sets* of *rules*"""
+        self._rules_by_var = dict()
+        for var in self.variables:
+            for n in self._n_ary_rules.keys():
+                for rule in self._n_ary_rules[n]:
+                    if rule.source() == var:
+                        if var not in self._rules_by_var.keys():
+                            self._rules_by_var[var] = {rule}
+                        else:
+                            self._rules_by_var[var].add(rule)
 
+        if self.check_CFG():
+            self.check_CNF()
+            
     def check_CFG(self):
         """
         Check that self.terminals, self.variables, self._n_ary_rules, 
-        and self.start_symbol define a valid PCFG
+        and self.start_symbol define a valid CFG
         """
         prop1a = type(self.terminals) is set
-        assert prop1a, "self.terminals must be a set"
+        
         prop2a = type(self.variables) is set
-        assert prop2a, "self.variables must be a set"
-        prop3a =  type(self._n_ary_rules) is dict
-        assert prop3a, "self._nary_rules must be a dict"
+
+        prop3a1 =  type(self._n_ary_rules) is dict
+
+        prop3a2 = type(self._rules_by_var) is dict
+
         prop4a =  type(self.start_symbol) is Variable
-        assert prop4a,"self.start_symbol must be a Variable"
+
         prop1b = len(self.terminals) > 0
+
         prop2b = len(self.variables) > 0
-        prop3b = len(self._n_ary_rules) > 0
+
+        prop3b1 = len(self._n_ary_rules) > 0
+
+        prop3b2 = len(self._rules_by_var) > 0
+
         prop4b = self.start_symbol in self.variables
         
-        if not (prop1a and prop2a and prop3a and prop4a and prop1b and prop2b and prop3b and prop4b):
-            self.Trained = False
+        if not (prop1a and prop2a and prop3a1 and prop3a2 and prop4a and
+                prop1b and prop2b and prop3b1 and prop3b2 and prop4b):
             return False
                  
-        term_check = True
+
+        #Check that every element in self.terminal is a Terminal
         for symbol in self.terminals:
             p = (type(symbol) is Terminal)
-            assert p, "self.terminals contains an object of type other than Terminal"
             if not p:
-                 term_check = False
-                 break
+                 print("Not every element in self.terminal is a Terminal")
+                 return False
 
-        var_check = True
+
+        #Check that every element in self.variable is a Variable
         for symbol in self.variables:
             p = (type(symbol) is Variable)
-            assert p, "self.variables contains an object of type other than Variable"
             if not p:
-                 var_check = False
-                 break
+                print("Not every element of self.variable is a Variable.")
+                return False
 
-        n_ary_check = True
 
+        #Check the rule index is indexed by an int and has value a Rule
         for key in self._n_ary_rules.keys():
-            p = type(key) is int and type(self._n_ary_rules[key]) is Rule
+            p = type(key) is int
             if not p:
-                 n_ary_check = False
-                 break
+                print("keys to _n_ary_rules should all be integers")
+                return False
+            else:
+                if type(self._n_ary_rules[key]) is not set:
+                    print("Values of self._n_ary_rules should be sets")
+                    return False
+                else:
+                    for rule in self._n_ary_rules[key]:
+                        if type(rule) is not Rule:
+                            print("Something in the set _n_ary_rules[",key,"] is not a rule.")
+                            return False
                  
-        if term_check and var_check and n_ary_check:
-            """#Probably want to also include restriction that
-            the Symbols in the Rules in self._n_ary_rules 
-            all appear in self.terminals and self.variables.
-            """
-            self.Trained = True
-            return True
-        else:
-            self.Trained = False
-            return False
-
+        return True
+        
     def get_rules_of_arity(self, n):
         """Return the set of rules of arity n"""
         if n not in self._n_ary_rules.keys():
             return {}
         return self._n_ary_rules[n]
 
+    def get_rules_by_source(self, var):
+        return self._rules_by_var[var]
+
+    
     def add_rule(self, rule):
         n = rule.arity()
         if n not in self._n_ary_rules.keys():
             self._n_ary_rules[n] = {rule}
         else:
             self._n_ary_rules[n].add(rule)
+        var = rule.source()
+        if var not in self._rules_by_var.keys():
+            self._rules_by_var[var] = {rule}
+        else:
+            self._rules_by_var[var].add(rule)
 
     def unary_rules(self):
         return self.get_rules_of_arity(1)
@@ -189,32 +217,87 @@ class CFG():
     def get_terminals(self, sentence):
         """The lexer/tokenizer."""
         for token in sentence.split():
-            new_symbol = Terminal(token)
-            yield new_symbol
+            new_terminal = Terminal(token)
+            yield new_terminal
 
+    def check_CNF(self):
+        #Only rules of arity 1 and 2:
+        arity_check = self._n_ary_rules.keys() == {1, 2}
+        if not arity_check:
+            print("Not CNF: (rule aritys not exactly {1,2})")
+            self._CNF = False
+            return False
+        for unary_rule in self.unary_rules():
+            check = type(unary_rule.targets()[0]) is Terminal
+            if not check:
+                print("Not CNF:  There are unary rules \
+                that do not have a Terminal as target")
+                self._CNF = False
+                return False
+        for binary_rule in self.binary_rules():
+            check = type(binary_rule.targets()[0]) is Variable and \
+                    type(binary_rule.targets()[1]) is Variable
+            if not check:
+                print("There are binary rules with targets that are not Variables")
+                self._CNF = False
+                return False
+        self._CNF = True
+        return True
+    
                  
 class PCFG(CFG):
 
     def __init__(self, terminals = set(), variables = set(),
-                 rules_of_arity = dict(), q = dict()):
+                 rules_of_arity = dict(), start_symbol = Variable(START_SYMBOL_CODE),
+                 q = dict()):
 
         super().__init__(terminals = terminals, variables = variables,
-                         rules_of_arity = rules_of_arity)
+                         rules_of_arity = rules_of_arity, start_symbol = start_symbol)
 
         self._q = q
-                 
-        self.check_PCFG()
+        self.TOLERANCE = TOLERANCE
+        if self.check_PCFG():
+            self.check_CNF()
 
+    # def __init__(self, cfg, q = dict())
+    
     def check_PCFG(self):
-        return self.check_CFG() and self.check_q()
+        #Sets self.trained
+        cfg = self.check_CFG()
+        print("Valid CFG?: ", cfg)
+        if cfg:
+            valid_q = self.check_q()
+            print("Valid parameters?:  ", valid_q)
+            return valid_q
+        else: return False
 
+        
     def check_q(self):
+        """Verifies that the q parameter data on record actually makes sense."""
+        
         for rule in self._q.keys():
             q = self._q[rule]
-            prop = type(rule) is Rule and type(q) is float and 0 <= q <= 1
+            prop = type(rule) is Rule
+            prop2 = type(q) is float and 0 <= q <= 1
             if not prop:
+                print("Not every rule is a Rule :(")
                 return False
-        return True
+            elif not prop2:
+                print("q values for rules must be floats between 0 and 1 inclusive.")
+                return False
+            else:
+                for var in self.variables:
+                    sum = 0 
+                    for rule in self._rules_by_var[var]:
+                        sum += self._q[rule]
+                    if abs(1 - sum) > self.TOLERANCE:
+                        print("The rules with source equal to the Variable ", var)
+                        print("do not have parameters summing to within self.TOLERANCE of 1.")
+                        print("The sum is ", sum)
+                        return False
+                return True
+
+        
 
     def set_q(self, rule, q):
         """Set the parameter value for a given rule."""
@@ -226,7 +309,7 @@ class PCFG(CFG):
     def train_from_file(self, file_path, file_type = "CNF_COUNTS"):
         """
         This function is meant to act on a variety of data file formats in order to
-
+ 
         1)  Learn the Terminals and Variables AND
         2)  Compute the transition rule set (for self.get_rules_of_arity(<arity>)) AND
         3)  Compute the q parameter for each transition rule (for self.q(<rule>)
@@ -276,8 +359,6 @@ class PCFG(CFG):
                     q = count / variable_counts[source]
                     self.set_q(rule, q)
                     
-            self.check_PCFG()
-            self.CNF = True #make this the result of some check function
             
         elif c_file_style == "NCNF_COUNTS":
             pass
@@ -285,14 +366,18 @@ class PCFG(CFG):
             pass
         else:
             pass
-                 
-            
+        trained = self.check_PCFG()
+        if trained:
+            cnf = self.check_CNF()
+            print("CNF?  ", cnf)
+              
     def score(self, sentence, algorithm = "inside"):
         """Score a sentence with respect to the PCFG."""
         terminals = list(self.get_terminals(sentence))
         assert self.check_terminals(terminals)
         if algorithm == "inside":
-            assert self.CNF, "This PCFG is not in Chomsky Normal Form.  Cannot apply inside algorithm."
+            assert self._CNF, "This PCFG is not in Chomsky Normal Form. \
+            Cannot apply inside algorithm."
             print("Applying Inside algorithm...")
             return self.inside(terminals)
         else:
@@ -307,7 +392,7 @@ class PCFG(CFG):
         terminals = list(self.get_terminals(sentence))
         assert self.check_terminals(terminals)
         if algorithm == "CKY":
-            assert self.CNF, "This PCFG is not in Chomsky Normal Form.  Cannot apply inside algorithm."
+            assert self._CNF, "This PCFG is not in Chomsky Normal Form.  Cannot apply inside algorithm."
             print("Applying CKY algorithm...")
             return self.CKY(terminals)
         else:
@@ -345,7 +430,7 @@ class PCFG(CFG):
                                        pi[i, s, Y] * pi[s+1, j, Z]
                     pi[(i, j, X_0)] = sum
         
-        result = pi[0,N-1, Symbol(START_SYMBOL_CODE)]
+        result = pi[0,N-1, Variable(START_SYMBOL_CODE)]
         print("Final Score:  ", result)
         return result
 
@@ -393,7 +478,7 @@ class PCFG(CFG):
                     pi[(i, j, X_0)] = max_score
                     bp[(i, j, X_0)] = (best_rule, best_cut)
         
-        return self.recover_tree(bp, symbols, 0, N-1, Symbol(START_SYMBOL_CODE))
+        return self.recover_tree(bp, symbols, 0, N-1, Variable(START_SYMBOL_CODE))
 
     def recover_tree(self, bp, symbols, i, j, X):
         """Recover a parse tree from a dictionary of back-pointers."""
