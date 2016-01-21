@@ -1,0 +1,12 @@
+S .2
+S S .2
+S NP VP .6
+NP DET NN .8
+NP thomas .1
+NP sally .1
+DET the 1.
+NN milkman 1.
+VP VT NP .6
+VP VI .4
+VI runs 1.
+VT greets 1.
