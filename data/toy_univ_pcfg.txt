@@ -1,4 +1,4 @@
-S .2
+S VP .2
 S S .2
 S NP VP .6
 NP DET NN .8
@@ -9,4 +9,5 @@ NN milkman 1.
 VP VT NP .6
 VP VI .4
 VI runs 1.
-VT greets 1.
+VT greets .7
+VT walks .3

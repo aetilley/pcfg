@@ -1,8 +1,10 @@
+from digraph import Digraph
+
+
 TOLERANCE = .00000000000001
 START_SYMBOL_CODE = "S"
 
 """Probabilistic Context-Free Grammar parser/scorer."""
-
 
 def read_lines(training_file_path):
     """Read lines from a file a return an iterator of lists"""
@@ -32,19 +34,18 @@ class Symbol:
 class Variable(Symbol):
     """(The class of Nonterminal Symbols)"""
     def __init__(self, var_code = ""):
-        self._symbol_code = var_code #For Now
+        self.var_code = var_code
+        self._symbol_code = self.var_code #For Now
 
 
 
 class Terminal(Symbol):
-        def __init__(self, term_code = None, from_string = None):
+        def __init__(self, term_code = "", from_string = None):
             if from_string:
-                self._symbol_code = from_string
-            elif term_code:
-                self._symbol_code = term_code #For now
+                self.term_code = from_string
             else:
-                print('Valid form:  Terminal(term_code) | Terminal(from_string)')
-                
+                self.term_code = term_code
+            self._symbol_code = self.term_code #For Now
 
 class Rule:
     """A transformation (rewrite) rule for any CFG"""
@@ -61,7 +62,6 @@ class Rule:
         self.check_Rule()
 
     def check_Rule(self):
-        
         assert type(self._source) is Variable, "The source must be of type Variable."
         for target in self._targets:
             assert isinstance(target,  Symbol),  "All targets must be instances of type Symbol."
@@ -75,8 +75,33 @@ class Rule:
         return len(self._targets)
 
     def targets(self):
-        """ Return tuple of target symbols """
         return self._targets
+    
+    def target(self, i):
+        """ Return tuple of target symbols """
+        return self._targets[i]
+
+    def set_target(self, i, new_target):
+        self._targets[i]= new_target
+    
+
+    def substitute(self, sub_dict):
+        source = self.source()
+        if source in sub_dict.keys():
+            new_source = sub_dict[source]
+        else:
+            new_source = source
+        new_targets = ()
+        for target in self.targets():
+            if target in sub_dict.keys():
+                new_target = sub_dict[target]
+            else:
+                new_target = target
+            new_targets = new_targets + (new_target,)
+        new_rule = Rule(new_source, new_targets)
+        return new_rule
+        
+
 
     def __str__(self):
         return self._source.__str__() + " " + self._targets.__str__()
@@ -102,21 +127,24 @@ class CFG:
         self._n_ary_rules = rules_of_arity or dict()
         """ another dict where the indices are source Variables, 
         and again, values are corresponding *sets* of *rules*"""
-        self._rules_by_var = dict()
-        for var in self.variables:
-            for n in self._n_ary_rules.keys():
-                for rule in self._n_ary_rules[n]:
-                    if rule.source() == var:
-                        if var not in self._rules_by_var.keys():
-                            self._rules_by_var[var] = {rule}
-                        else:
-                            self._rules_by_var[var].add(rule)
+        self._rules_by_var = self.update_rules_by_var()
+
         self._CFG = self.check_CFG()
         if self._CFG:
             self._CNF = self.check_CNF()
 
-                 
-            
+    def update_rules_by_var(self):
+        result = dict()
+        for var in self.variables:
+            for n in self._n_ary_rules.keys():
+                for rule in self._n_ary_rules[n]:
+                    if rule.source() == var:
+                        if var not in result.keys():
+                            result[var] = {rule}
+                        else:
+                            result[var].add(rule)
+        return result
+
             
     def check_CFG(self):
         """
@@ -192,6 +220,9 @@ class CFG:
         else:
             self._rules_by_var[var].add(rule)
 
+    def remove_rule(self, rule):
+        self._n_ary_rules[rule.arity()].remove(rule)
+        self._rules_by_var[rule.source()].remove(rule)
     def unary_rules(self):
         return self.get_rules_of_arity(1)
 
@@ -222,14 +253,14 @@ class CFG:
             print("Not CNF: (rule aritys not exactly {1,2})")
             result = False
         for unary_rule in self.unary_rules():
-            unary_check = type(unary_rule.targets()[0]) is Terminal
+            unary_check = type(unary_rule.target(0)) is Terminal
             if not unary_check:
                 print("Not CNF:  There are unary rules that do not have a Terminal as target")
                 result = False
                 break
         for binary_rule in self.binary_rules():
-            binary_check = type(binary_rule.targets()[0]) is Variable and \
-                    type(binary_rule.targets()[1]) is Variable
+            binary_check = type(binary_rule.target(0)) is Variable and\
+                           type(binary_rule.target(1)) is Variable
             if not binary_check:
                 print("There are binary rules with targets that are not Variables")
                 result = False
@@ -243,7 +274,7 @@ class PCFG(CFG):
     def __init__(self, terminals = None, variables = None,
                  rules_of_arity = None, start_symbol = Variable(START_SYMBOL_CODE),
                  q = None):
-        super(PCFG, self).__init__(terminals, variables, rules_of_arity, start_symbol)
+        super().__init__(terminals, variables, rules_of_arity, start_symbol)
         self._q = q or dict()
         self.TOLERANCE = TOLERANCE
         if self._CFG:
@@ -290,8 +321,9 @@ class PCFG(CFG):
                     
         print("Valid Parameters?:  ", result)
         return result
-
-
+    def remove_rule(self, rule):
+        super().remove_rule(rule)
+        self._q.pop(rule)
     def set_q(self, rule, q):
         """Set the parameter value for a given rule."""
         self._q[rule] = q
@@ -412,11 +444,205 @@ class PCFG(CFG):
             print("Unknown file_type parameter.")
             
         #Examine Result of Import:
+        print("Training complete.  Running self-check...")
         self._CFG = self.check_CFG()
         if self._CFG:
             self.check_q()
             self._CNF = self.check_CNF()
-              
+
+
+
+
+
+
+
+
+
+
+
+
+#Begin helper functions for main conversion function
+            
+    def add_term_variables(self):
+
+        """
+        For each terminal T that appears in the RHS
+        of some rule of arity n > 1, replace T by a variable U_T in that rule.
+        Also add the unary rule from U_T to T and add the
+        associated parameter 1. for this new rule.
+        """
+
+        for n in self._n_ary_rules.keys():
+            if n > 1:
+                rules_to_add = set()
+                rules_to_remove = set()
+                for rule in self.get_rules_of_arity(n):
+                    new_targets = ()
+                    for i in range(n):
+                        symbol = rule.target(i)
+                        
+                        if type(symbol) is Terminal:
+                            rules_to_remove.add(rule)
+                            new_var = Variable("U-"+symbol.term_code)
+                            new_target = new_var                            
+                            self.variables.add(new_var)
+                            new_aux_rule = Rule(new_var, (symbol,))
+                            self.add_rule(new_aux_rule)
+                            self.seq_q(new_aux_rule, 1.)
+                        else:
+                            new_target = symbol
+                        new_targets = new_targets + (new_target,)
+                        
+                    new_rule = Rule(rule.source(), new_targets)
+                    rules_to_add.add(new_rule)
+                    self.set_q(new_rule, self.q(rule))
+                for rule in rules_to_remove:
+                    self.remove_rule(rule)
+                for rule in rules_to_add:
+                    self.add_rule(rule)    
+                        
+     
+    def remove_higher_arities(self):
+        for n in self._n_ary_rules.keys():
+            if n > 2:
+                rules_to_add = set()
+                rules_to_remove = set()
+                #For each rule of arity at least 3...
+                for rule in self.get_rules_of_arity(n):
+                    source = rule.source()
+                    targets = rule.targets()
+                    #Add the steppingstones...
+                    last  = source
+                    for i in range(n):
+                        new_var_index = i+1 #(bowing to Cole)
+                        new_var_code = "X" + str(new_var_index) + str(hash(rule))
+                        new_var = Variable(var_code = new_var_code)
+                        self.variables.add(new_var)
+                        new_binary_rule = Rule(last,(rule.target(i), new_var))
+                        self.add_rule(new_binary_rule)
+                        new_q  = self.q(rule) if i == 0 else 1
+                        self.set_q(new_binary_rule, new_q)
+                                       
+                        last = new_var
+                    #and remove the rule of high arity.
+                    self.remove_rule(rule)
+
+    def refresh_start_symbol(self):
+        start = self.start_symbol
+        #Make a new special symbol...
+        special = Variable(var_code = start.var_code + "'")
+        self.variables.add(special)
+        #...substitute special for the start symbol throughout...
+        for n in self._n_ary_rules.keys():
+            
+            iteration_copy = self.get_rules_of_arity(n).copy()
+            for rule in iteration_copy:
+                q = self.q(rule)
+                self.remove_rule(rule)
+                new_rule = rule.substitute({start: special})
+                self.add_rule(new_rule)                
+                self.set_q(new_rule, q)
+
+        start_symbol_rule = Rule(start, (special,))
+        self.add_rule(start_symbol_rule)
+        self.set_q(start_symbol_rule, 1.)
+
+    def compute_unit_rule_graph(self):
+
+        graph = dict()
+        for unary_rule in self.unary_rules():
+            tip  = unary_rule.target(0)
+            if type(tip) is Variable:
+                tail = unary_rule.source()
+                if tail in graph.keys():
+                    graph[tail].add(tip)
+                else:
+                    graph[tail] = {tip}
+        dg = Digraph(E = graph)
+        return dg
+        # compute s.c.c. of graph
+
+
+        
+    def remove_unit_rules(self):
+
+        G = self.compute_unit_rule_graph()
+        #First absorb strongly connected components to make acyclic
+        var_to_root_map = G.compute_roots()
+        #Replace each non-root variable occurence by its root in every rule
+        for n in self._n_ary_rules.keys():
+            rules_to_add = set()
+            for rule in self.get_rules_of_arity(n):
+                new_rule = rule.substitute(var_to_root_map)
+                rules_to_add.add(new_rule)
+            self._n_ary_rules[n] = rules_to_add
+        
+        new_variables = set()
+        #Remove all non-root variables.
+        for var in G.V:
+            new_var = var_to_root_map[var]
+            new_variables.add(new_var)
+        self.variables = self.variables.difference(G.V.difference(new_variables))
+            
+        # And now that .variables is updated we can use the following update function
+        self._rules_by_var = self.update_rules_by_var()
+        #(since above we added without using add_rule)
+
+        #And remove the trivial unit rules (V -> V)
+        for var in self.variables:
+            trivial = Rule(var, (var,))
+            if trivial in self.unary_rules():
+                self.remove_rule(trivial)
+
+
+        #Finally we do a reverse topological traversal of the new graph
+        H = self.compute_unit_rule_graph()
+
+        #Note that this is now a DAG and thus has a topological order.
+
+        topological = H.reverse_DFS_post_order()
+        order  = reversed(topological)
+        for vertex in order:
+            #Find the edges in H that point to vertex
+            for tail in H.V:
+                if vertex in H.E[tail]:
+                    unary_rule = Rule(tail, (vertex,))
+                    for binary_rule in self.binary_rules().copy():
+                        if binary_rule.source() == vertex:
+                            new_rule = Rule(tail, binary_rule.targets())
+                            new_q = self.q(binary_rule) * self.q(unary_rule)#sure?
+                            self.add_rule(new_rule)
+                            self.set_q(new_rule, new_q)
+                    self.remove_rule(unary_rule)
+
+
+                    
+    def make_CNF(self):
+        """
+        Adds appropriate symbols and adds/removes appropriate rules
+        to turn any valid CFG into one in Chomsky Normal Form
+        """
+
+        print("""This process will change the underlying symbol sets
+        and rule sets of the PCFG. 
+        Continue? (Enter to Continue, CTRL-C to abort.)""")
+        input()            
+
+        self.add_term_variables()
+            
+        self.remove_higher_arities()
+        
+        self.refresh_start_symbol()
+        
+        #(Later) remove_zero_ary_rules()  
+
+        self.remove_unit_rules()
+
+        self._CNF = self.check_CNF()
+        
+
+
+            
     def score(self, sentence, algorithm = "inside"):
         """Score a sentence with respect to the PCFG."""
         terminals = list(self.get_terminals(sentence))

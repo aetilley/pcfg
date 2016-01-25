@@ -3,7 +3,7 @@ Probabilistic Context Free Grammar parser/scorer object inspired by Yu Usami's P
 (1) Basic Usage
 (2) File Types understood by self.train_from_file()
 
-
+***
 
 (1) Basic Usage:
 
@@ -13,10 +13,12 @@ Probabilistic Context Free Grammar parser/scorer object inspired by Yu Usami's P
 Input data has wrong signature
 Valid CFG?:  False
 
->  cnf_grammar.train_from_file("data/typed_counts_file_0.txt", file_type="CNF_COUNTS")
-Valid CFG?:  True
+>  cnf_grammar.train_from_file("data/toy_cnf_counts", file_type="CNF_COUNTS")
+Training complete.  Running self-check...
+Valid CFG?:   True
 Valid Parameters?:   True
-CNF?   True
+CNF?:   True
+
 
 > cnf_grammar.check_PCFG()
 Valid CFG?: True
@@ -46,11 +48,10 @@ Input data has wrong signature
 Valid CFG?:   False
 
 > other_grammar.train_from_file("data/toy_univ_pcfg.txt", file_type="UNIV_PCFG")
+Training complete.  Running self-check...
 Valid CFG?:   True
 Valid Parameters?:   True
-Not CNF: (rule aritys not exactly {1,2})
-Not CNF:  There are unary rules                 that do not have a Terminal as target
-Not CNF:  There are unary rules                 that do not have a Terminal as target
+Not CNF:  There are unary rules that do not have a Terminal as target
 CNF?:   False
 
 > other_grammar.check_CFG()
@@ -62,14 +63,49 @@ Valid Parameters?:   True
 Out: True
 
 > other_grammar.check_CNF()
-Not CNF: (rule aritys not exactly {1,2})
-Not CNF:  There are unary rules                 that do not have a Terminal as target
-Not CNF:  There are unary rules                 that do not have a Terminal as target
+Not CNF:  There are unary rules that do not have a Terminal as target
 CNF?:   False
 Out: False
 
 > other_grammar.score("thomas greets sally")
 This PCFG is not in Chomsky Normal Form. Cannot apply inside algorithm.
+
+>len(other_grammar.variables)
+Out: 7
+
+> other_grammar.make_CNF()
+Out[17]: 7
+
+In [18]: other_grammar.make_CNF()
+This process will change the underlying symbol sets
+        and rule sets of the PCFG. 
+        Continue? (Enter to Continue, CTRL-C to abort.)
+
+CNF?:   True
+
+>other_grammar.check_CNF()
+CNF?:   True
+Out: True
+
+>len(other_grammar.variables)
+Out: 8
+
+>other_grammar.score("thomas greets sally")
+Applying Inside algorithm...
+Final Score:   0.00252
+Out: 0.00252
+
+> other_grammar.parse("thomas greets sally")                                             
+Applying CKY algorithm...
+Out: 
+{'left_branch': {'tag': NP, 'terminal': thomas},
+ 'right_branch': {'left_branch': {'tag': VT, 'terminal': greets},
+  'right_branch': {'tag': NP, 'terminal': sally},
+  'tag': VP},
+ 'tag': S}
+
+
+***
 
 
 
