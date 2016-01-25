@@ -1,4 +1,3 @@
-Probabilistic Context Free Grammar parser/scorer object inspired by Yu Usami's PCFG parser (https://github.com/usami/pcfg).
 
 (1) Basic Usage
 (2) File Types understood by self.train_from_file()
