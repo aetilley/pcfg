@@ -56,7 +56,10 @@ class Digraph:
             G_R.assign(vertex, vertex, assignments)
                 #Assign vert and all descendants to same component
         return assignments
-            
+    
+    def equiv(self, my_var):
+        map = self.compute_roots()
+        return {var for var in self.V if map[var] == map[my_var]}
             
     
     def reverse_DFS_post_order(self):

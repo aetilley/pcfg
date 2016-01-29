@@ -46,11 +46,13 @@ Out[]:
 Input data has wrong signature
 Valid CFG?:   False
 
-> other_grammar.train_from_file("data/toy_univ_pcfg.txt", file_type="UNIV_PCFG")
+> other_grammar.train_from_file("data/toy_univ_pcfg.txt", file_type = "UNIV_PCFG")
 Training complete.  Running self-check...
 Valid CFG?:   True
 Valid Parameters?:   True
+Not CNF: the arity  3 is non-empty
 Not CNF:  There are unary rules that do not have a Terminal as target
+Not CNF:  There are binary rules with targets that are not Variables
 CNF?:   False
 
 > other_grammar.check_CFG()
@@ -70,12 +72,9 @@ Out: False
 This PCFG is not in Chomsky Normal Form. Cannot apply inside algorithm.
 
 >len(other_grammar.variables)
-Out: 7
+Out: 8
 
-> other_grammar.make_CNF()
-Out[17]: 7
-
-In [18]: other_grammar.make_CNF()
+>other_grammar.make_CNF()
 This process will change the underlying symbol sets
         and rule sets of the PCFG. 
         Continue? (Enter to Continue, CTRL-C to abort.)
@@ -87,7 +86,7 @@ CNF?:   True
 Out: True
 
 >len(other_grammar.variables)
-Out: 8
+Out: 11
 
 >other_grammar.score("thomas greets sally")
 Applying Inside algorithm...
@@ -96,7 +95,7 @@ Out: 0.00252
 
 > other_grammar.parse("thomas greets sally")                                             
 Applying CKY algorithm...
-Out: 
+Out:
 {'left_branch': {'tag': NP, 'terminal': thomas},
  'right_branch': {'left_branch': {'tag': VT, 'terminal': greets},
   'right_branch': {'tag': NP, 'terminal': sally},

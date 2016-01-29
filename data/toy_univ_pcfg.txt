@@ -1,13 +1,17 @@
 S VP .2
-S S .2
+S S .1
+S I love NP .1
 S NP VP .6
 NP DET NN .8
 NP thomas .1
 NP sally .1
 DET the 1.
 NN milkman 1.
-VP VT NP .6
-VP VI .4
+VP VT NP .3
+VP VI .3
+VP VP PP .4
+PP on NP .5
+PP at NP .5
 VI runs 1.
 VT greets .7
 VT walks .3
