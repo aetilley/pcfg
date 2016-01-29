@@ -71,27 +71,23 @@ Out: False
 > other_grammar.score("thomas greets sally")
 This PCFG is not in Chomsky Normal Form. Cannot apply inside algorithm.
 
->len(other_grammar.variables)
-Out: 8
-
 >other_grammar.make_CNF()
 This process will change the underlying symbol sets
         and rule sets of the PCFG. 
         Continue? (Enter to Continue, CTRL-C to abort.)
 
+Valid CFG?:   True
+Valid Parameters?:   True
 CNF?:   True
 
 >other_grammar.check_CNF()
 CNF?:   True
 Out: True
 
->len(other_grammar.variables)
-Out: 11
-
 >other_grammar.score("thomas greets sally")
 Applying Inside algorithm...
-Final Score:   0.00252
-Out: 0.00252
+Final Score:   0.0014
+Out: 0.0014
 
 > other_grammar.parse("thomas greets sally")                                             
 Applying CKY algorithm...
