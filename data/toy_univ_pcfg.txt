@@ -6,7 +6,8 @@ NP DET NN .5
 NP thomas .1
 NP sally .1
 NP NN .3
-NN milk .6
+NN NP .2
+NN milk .4
 NN milkman .4
 DET the 1.
 VP VT NP .3

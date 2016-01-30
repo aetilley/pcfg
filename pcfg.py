@@ -102,6 +102,7 @@ class Rule:
         return new_rule
         
     def substitute_many(self, var, new_targs):
+        assert type(new_targs) is tuple
         same_source = self.source()
         new_targets = ()
         for target in self.targets():
@@ -603,22 +604,21 @@ class PCFG(CFG):
             root_variables.add(new_var)
 
         for var in self.variables.difference(root_variables):
-            #Collect transitions from var
-            extensions = self.get_rules_from_source(var)
-            keep = {"FILLA": 0}
+            extensions = self.get_rules_from_source(var).copy()
+            filla = Terminal("FILLA")
+            keep = {(filla,): 0}
             for extension in extensions:
                 if var in extension.targets():
-                    keep[Variable("FILLA")] += self.q(extension)
-                    self.remove_rule(extension)
+                    keep[filla] += self.q(extension)
                 else:
                     keep[extension.targets()] = self.q(extension)
-                    self.remove_rule(extension)
-            for n in self._n_ary_rules.keys():
+                self.remove_rule(extension)
+            for n in self._n_ary_rules.copy().keys():
                 for rule in self.get_rules_of_arity(n).copy():
                     if var in rule.targets():
-                        for sub_targets in extensions.keys():
+                        for sub_targets in keep.keys():
                             new_rule = rule.substitute_many(var, sub_targets)
-                            new_q = self.q(rule) * extensions[sub_targets]
+                            new_q = self.q(rule) * keep[sub_targets]
                             self.add_rule(new_rule)
                             self.set_q(new_rule, new_q)
                         self.remove_rule(rule)
