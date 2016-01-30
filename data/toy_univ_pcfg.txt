@@ -2,11 +2,13 @@ S VP .2
 S S .1
 S I love NP .1
 S NP VP .6
-NP DET NN .8
+NP DET NN .5
 NP thomas .1
 NP sally .1
+NP NN .3
+NN milk .6
+NN milkman .4
 DET the 1.
-NN milkman 1.
 VP VT NP .3
 VP VI .3
 VP VP PP .4

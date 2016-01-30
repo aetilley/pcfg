@@ -101,7 +101,16 @@ class Rule:
         new_rule = Rule(new_source, new_targets)
         return new_rule
         
-
+    def substitute_many(self, var, new_targs):
+        same_source = self.source()
+        new_targets = ()
+        for target in self.targets():
+            if target == var:
+                new_targets = new_targets + new_targs
+            else:
+                new_targets = new_targets + (target,)
+        new_rule = Rule(same_source, new_targets)
+        return new_rule
 
     def __str__(self):
         return self._source.__str__() + " " + self._targets.__str__()
@@ -111,7 +120,10 @@ class Rule:
 
     def __hash__(self):
         return hash((self._source, self._targets))
-    
+
+    def __repr__(self):
+        return self._source.__str__() + " " + self._targets.__str__()
+
 class CFG:
 
     def __init__(self, terminals = None, variables = None,
@@ -334,7 +346,15 @@ class PCFG(CFG):
             
     def q(self, rule):
         return self._q[rule]
-            
+
+
+    def print_all_rules_and_params(self):
+        for n in self._n_ary_rules.keys():
+            for rule in self.get_rules_of_arity(n):
+                print("Rule: ",rule)
+                print("parameter: ",self.q(rule))
+
+    
     def train_from_file(self, file_path, file_type = "CNF_COUNTS"):
         """
         This function is meant to act on a variety of data file formats in order to
@@ -458,13 +478,9 @@ class PCFG(CFG):
 
 
 
-
-
-
-
-
-
-
+#
+#
+#
 #Begin helper functions for main conversion function
             
     def add_term_variables(self):
@@ -571,38 +587,77 @@ class PCFG(CFG):
             new_q = old_q + old_q*(q_to_redist / (1 - q_to_redist))
             self.set_q(rule, new_q)
 
-
-            
-        
-    def remove_unit_rules(self):
-        """
-        A unit rule is a unary rule whose target is a Variable.
-        """
+    def absorb_strong_components(self, recursion_depth = 0):
         
         G = self.compute_unit_rule_graph()
 
-        #First absorb strongly connected components to make acyclic.
-        #We compute the equiv. classes
+        #We aim to absorb strongly connected components to make digraph acyclic.
         
         var_to_root_map = G.compute_roots()
+        
+        #print("root of NP is", var_to_root_map[Variable("NP")])
         
         root_variables = set()
         for var in self.variables:
             new_var = var_to_root_map[var]
             root_variables.add(new_var)
 
-
+        for var in self.variables.difference(root_variables):
+            #Collect transitions from var
+            extensions = self.get_rules_from_source(var)
+            keep = {"FILLA": 0}
+            for extension in extensions:
+                if var in extension.targets():
+                    keep[Variable("FILLA")] += self.q(extension)
+                    self.remove_rule(extension)
+                else:
+                    keep[extension.targets()] = self.q(extension)
+                    self.remove_rule(extension)
+            for n in self._n_ary_rules.keys():
+                for rule in self.get_rules_of_arity(n).copy():
+                    if var in rule.targets():
+                        for sub_targets in extensions.keys():
+                            new_rule = rule.substitute_many(var, sub_targets)
+                            new_q = self.q(rule) * extensions[sub_targets]
+                            self.add_rule(new_rule)
+                            self.set_q(new_rule, new_q)
+                        self.remove_rule(rule)
+                    else:
+                        pass
             
-        #Replace each non-root variable occurence by its root in every rule
+        #Update self.variables
+        self.variables = root_variables
+
+        #And remove the trivial unit rules (V -> V)
+        for var in self.variables:
+            trivial = Rule(var, (var,))
+            if trivial in self.unary_rules():
+                self.remove_and_renormalize(trivial)
+
+        
+    def remove_unit_rules(self):
+        """
+        A unit rule is a unary rule whose source and target are both Variables.
+        """
+
+        #Replace each non-root variable occurence by its root in every rule.
+
+        #First we build a dictionary from source symbols in the larger language into
+        #target strings in the reduced language
+        """
+
+        unary_rules_copy = self.unary_rules().copy() #hack
+        q_copy = self._q.copy() #hack
+        
         for n in self._n_ary_rules.keys():
 
             q_sums = dict()
             for var in self.variables:
                 q_sums[var]=dict()
                 
-            rules_copy =self.get_rules_of_arity(n).copy()
-            
-            for rule in rules_copy:
+            rules_of_arity_n_copy =self.get_rules_of_arity(n).copy()
+
+            for rule in rules_of_arity_n_copy:
                 old_source = rule.source()
                 new_rule = rule.substitute(var_to_root_map)
                 new_targets = new_rule.targets()
@@ -611,13 +666,14 @@ class PCFG(CFG):
                     q_sums[old_source][new_targets] += self.q(rule)
                 else:
                     q_sums[old_source][new_targets] = self.q(rule)
-                    
+
                 self.remove_rule(rule)
 
-            #This is overkill but
-            for rule in rules_copy:
-                new_rule = rule.substitute(var_to_root_map)
 
+            #Now make new rules
+            for rule in rules_of_arity_n_copy:
+    
+                new_rule = rule.substitute(var_to_root_map)
                 new_source = new_rule.source()
                 new_targets = new_rule.targets()
 
@@ -625,27 +681,24 @@ class PCFG(CFG):
                 for eq_var in G.equiv(new_source):
                     if eq_var != new_source:
                         link_rule = Rule(new_source, (eq_var,))
-                        if link_rule in self.unary_rules():
-                            factor = self.q(link_rule)
+                        if link_rule in unary_rules_copy:
+                            factor1 = q_copy[link_rule]
                         else:
-                            factor = 0
-                        tot += factor * q_sums[eq_var][new_targets]
+                            factor1 = 0
+                        if new_targets in q_sums[eq_var].keys():
+                            factor2 = q_sums[eq_var][new_targets]
+                        else:
+                            factor2 = 0
+                        tot += factor1 * factor2
+                term0 = q_sums[new_source][new_targets] \
+                        if new_targets in q_sums[new_source].keys() else 0
+                new_q = term0 + tot
                 
-                new_q = q_sums[new_source][new_targets] + tot
-
                 self.add_rule(new_rule)
+
                 self.set_q(new_rule, new_q)
-
-
-                
-        #Update self.variables
-        self.variables = root_variables
-            
-        #And remove the trivial unit rules (V -> V)
-        for var in self.variables:
-            trivial = Rule(var, (var,))
-            if trivial in self.unary_rules():
-                self.remove_and_renormalize(trivial)
+        """
+        
 
         #Finally we do a reverse topological traversal of the new graph
         H = self.compute_unit_rule_graph()
@@ -689,11 +742,11 @@ class PCFG(CFG):
         to turn any valid CFG into one in Chomsky Normal Form
         """
 
-        print("""This process will change the underlying symbol sets
-        and rule sets of the PCFG. 
+        print("""This process will change the underlying symbol sets and rule sets of the PCFG. 
         Continue? (Enter to Continue, CTRL-C to abort.)""")
         input()            
-
+        #0
+        self.absorb_strong_components()
         
         #1
         self.add_term_variables()
