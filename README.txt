@@ -71,7 +71,7 @@ Out: False
 > other_grammar.score("thomas greets sally")
 This PCFG is not in Chomsky Normal Form. Cannot apply inside algorithm.
 
->other_grammar.make_CNF()
+> other_grammar.make_CNF()
 This process will change the underlying symbol sets
         and rule sets of the PCFG. 
         Continue? (Enter to Continue, CTRL-C to abort.)
@@ -80,27 +80,43 @@ Valid CFG?:   True
 Valid Parameters?:   True
 CNF?:   True
 
->other_grammar.check_CNF()
+> other_grammar.check_CNF()
 CNF?:   True
 Out: True
 
->other_grammar.score("thomas greets sally")
+> other_grammar.score("thomas greets sally")
 Applying Inside algorithm...
-Final Score:   0.0014
-Out: 0.0014
+Final Score:   0.0015844273426889994
+Out: 0.0015844273426889994
 
-> other_grammar.parse("thomas greets sally")                                             
+
+> other_grammar.parse("thomas greets sally")                                                     
 Applying CKY algorithm...
 Out:
-{'left_branch': {'tag': NP, 'terminal': thomas},
+{'left_branch': {'tag': U-thomas, 'terminal': thomas},
  'right_branch': {'left_branch': {'tag': VT, 'terminal': greets},
-  'right_branch': {'tag': NP, 'terminal': sally},
+  'right_branch': {'tag': U-sally, 'terminal': sally},
+  'tag': VP},
+ 'tag': S}
+
+> other_grammar.score("thomas greets the milkman")
+Applying Inside algorithm...
+Final Score:   0.0033711220057212757
+Out: 0.0033711220057212757
+
+> other_grammar.parse("thomas greets the milkman")                                               
+Applying CKY algorithm...
+Out:
+{'left_branch': {'tag': U-thomas, 'terminal': thomas},
+ 'right_branch': {'left_branch': {'tag': VT, 'terminal': greets},
+  'right_branch': {'left_branch': {'tag': DET, 'terminal': the},
+   'right_branch': {'tag': NN, 'terminal': milkman},
+   'tag': X0-332371785976609858},
   'tag': VP},
  'tag': S}
 
 
 ***
-
 
 
 (2) File Types understood by self.train_from_file:
