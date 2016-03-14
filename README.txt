@@ -169,9 +169,11 @@ An observation about training PCFGs:
 
 Notice that any file that could hope to uniquely train a complete PCFG object must determine a file in UNIV_PCFG format, and in this way UNIV_PCFG is a kind of universal receiver for training data set representations.  In practice however, most data that we do obtain in UNIV_PCFG format will have come from some sort of "counts file" at some point in its creation by way of MLE parameter estimates.
 
-This means that at some point after obtained the train corpus we there was a selection about legal rules; we can call the subset of allowable rules the *signature* of the PCFG (consider for instance the CNF restrictions).  But even with our signature selected, it is not enought to have a raw training corpus.  Rather we need semantic (parse) information about the corpus sufficient to record counts for all the rules in our signature.
+This means that at some point after we obtained the training corpus
+(1) There was a selection about legal rules; we can call the subset of allowable rules the *signature* of the PCFG (consider for instance the CNF restrictions).  But even with our signature selected,
+(2) It is not enought to have a raw training corpus.  Rather we need semantic (parse) information about the corpus sufficient to record counts for all the rules in our signature.
 
-In order to do this last part, there are really only two options.
+In order to do (2), there are really only two options.
 
 First, preferably, you obtain a manually annotated tree-bank of sentences in your corpus.  From this it should not be too hard to write a program that reads this treebank in its local format and outputs a counts file.
 
