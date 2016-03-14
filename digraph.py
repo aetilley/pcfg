@@ -74,9 +74,3 @@ class Digraph:
                 self.visit_all_then_log(v, log, visited)
         
         return list(reversed(log))
-        
-        
-    
-            
-        
-
