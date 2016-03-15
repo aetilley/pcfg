@@ -299,7 +299,11 @@ class CFG:
     
                  
 class PCFG(CFG):
-
+    """
+    A CFG with real numbers called parameters assigned to each rule such that the rules with 
+    fixed source have parameters summing to one.
+    """
+    
     def __init__(self, terminals = None, variables = None,
                  rules_of_arity = None, start_symbol = Variable(START_SYMBOL_CODE),
                  q = None):
@@ -320,8 +324,6 @@ class PCFG(CFG):
             return valid_q
         print("Valid PCFG?:  ", valid_q)
         return valid_q
-        
-
         
     def check_q(self):
         #This will be the source of KeyErrors if self.variables
@@ -352,6 +354,7 @@ class PCFG(CFG):
                     
         print("Valid Parameters?:  ", result)
         return result
+    
     def remove_rule(self, rule):
         super().remove_rule(rule)
         self._q.pop(rule)
@@ -362,13 +365,12 @@ class PCFG(CFG):
     def q(self, rule):
         return self._q[rule]
 
-
+    #There should be a similar function outputing a UNIV_PCFG format file for the pcfg
     def print_all_rules_and_params(self):
         for n in self._n_ary_rules.keys():
             for rule in self.get_rules_of_arity(n):
                 print("Rule: ",rule)
                 print("parameter: ",self.q(rule))
-
     
     def train_from_file(self, file_path, file_type = "CNF_COUNTS"):
         """
@@ -385,7 +387,7 @@ class PCFG(CFG):
         2)  The sources of all rules should be known variables, thus
         in particular we find that we can  determine a PCFG
         just by listing rules and their corresponding parameters
-        For example the following file gives a complete description of a PCFG:
+        For example the following UNIV_PCFG file gives a complete description of a PCFG:
 
         S .2
         S S .2
@@ -400,15 +402,17 @@ class PCFG(CFG):
         VI runs 1.
         VT greets 1.
                 
-        For any given line, that the first element (whitespace delimited element) is always the source of the rule in question.  
+        For any given line, that the first element (whitespace delimited element) is always the 
+        source of the rule in question.  
         The last element is always the probability of the transition from this source to the targets
         The aforementioned targests are exactly the zero or more elements between
         the first element and the last element of the line.
-        So for example the line S .2 would mean a 0-ary rule with source S and targets (), 
+        So for example the first line above would mean a 0-ary rule with source S and targets (), 
         and that the conditional probability of this transition to () given S is .2.
-        Note also that every symbol that appears in the middle but never on the left is assumed to be a Terminal
+        Note that, while a Variable (Non-terminal) may appear in the middle postions, every symbol that appears
+        in the middle and never on the left is assumed to be a Terminal.
 
-
+        <Scheduled for Deletion>
         file_type = "CNF_COUNTS" means the grammar to be learned is in Chomsky Normal Form and
         that the file contains lines of the form <count> <type> <args> where 
         <type> is "NONTERMINAL", "UNARYRULE", or "BINARYRULE"
@@ -417,6 +421,23 @@ class PCFG(CFG):
         or for this  transformation (for *ARYRULE)
         Assumes all "NONTERMINAL" come first.
 
+        UNIV_COUNTS file format consists of lines of the form
+
+        N SOURCE TARGETS
+
+        where N is some non-negative integer, SOURCE is (an identifier for) some source Variable or Non-terminal, 
+        and TARGETS is a list of zero or more (identifiers for) target symbols (either variables or terminals).
+        The idea here is that N is the number of times the rule from this SOURCE and to these TARGETS appears 
+        in the semantic data (say a tree-bank) for our training corpus.
+
+        Also note that, as with UNIV_PCFG format, we do not devote separate lines to listing the variables,
+        and we do not list arities of the rule for the line. There is one and only one rule per line,
+        and the arity can be read off as the length of TARGETS.
+        And once again we make the simplifying assumptions that, while Non-terminals may appear as target symbols,
+        a specific instance of a Non-terminal symbol in the semantic corpus data will always correspond to
+        an instance of a rule where that occurence of the non-terminal is the Source. 
+        Thus, in order to make a count of the total number of occurrences of a Non-terminal, 
+        we only need to sum the counts for the rules with that Non-terminal as their source.
         """
 
         
@@ -446,8 +467,43 @@ class PCFG(CFG):
                 self.add_rule(rule)
                 self.set_q(rule, q)
 
-        #file_type: CNF_COUNTS
-        elif file_type == "CNF_COUNTS":
+        #file_type:  UNIV_COUNTS
+        elif file_type == "UNIV_COUNTS":
+            variable_sums = dict()
+            for l in read_lines(file_path):
+                count = int(l[0])
+                source_symbol = l[1]
+                if source_symbol in variable_sums.keys():
+                    variable_sums[source_symbol] += count
+                else:
+                    variable_sums[source_symbol] = count
+                    source = Variable(source_symbol)
+                    self.variables.add(source)
+
+            for l in read_lines(file_path):
+                count = int(l[0])
+                source_symbol = l[1]
+                target_symbols = l[2:]
+                arity = len(target_symbols)
+                source = Variable(source_symbol)
+                targets = ()
+                for symbol in target_symbols:
+                    #Check if symbol is Terminal or Non-Terminal
+                    if symbol in variable_sums.keys():
+                        target = Variable(symbol)
+                    else:
+                        target = Terminal(symbol)
+                    targets = targets + (target,)
+                rule = Rule(source, targets)
+                #MLE Estimate
+                q = count / variable_sums[source_symbol]
+                self.add_rule(rule)
+                self.set_q(rule, q)
+                
+                """
+                #<scheduled for deletion>
+                file_type: CNF_COUNTS
+                elif file_type == "CNF_COUNTS":
 
             variable_counts = dict()
             
@@ -478,7 +534,7 @@ class PCFG(CFG):
                     #Record Conditional probability of the transition given the source
                     q = count / variable_counts[source]
                     self.set_q(rule, q)
-
+        """
         else:
             print("Unknown file_type parameter.")
             

@@ -1,0 +1,80 @@
+Raw corpus:
+1) Every cat loves a dog
+2) Fido is a cat
+3) Fido is a dog
+4) Fluffy is a cat
+5) Fido loves Fluffy
+6) Fluffy sleeps soundly
+
+Semantic Data (Tagged and Parsed):
+
+1) ((Every/DET cat/NN)/NP (loves/VT (a/DET dog/NN)/NP)/VP )/S
+
+2) (Fido/NP (is/VT (a/DET cat/NN)/NP)/VP)/S
+
+3) (Fido/NP (is/VT (a/DET dog/NN)/NP)/VP)/S
+
+4) (Fluffy/NP (is/VT (a/DET cat/NN)/NP)/VP)/S
+
+5) (Fido/NP (loves/VT Fluffy/NP)/VP)/S
+
+6) (Fluffy/NP (sleeps/VI soundly/ADV)/VP))/S
+
+
+Computing rule counts by line:
+
+1) (S, (NP, VP)): 1, (NP, (DET, NN)): 2, (VP, (VT, NP)): 1,
+(DET, (every,)): 1, (NN, (cat,)): 1, (VT, (loves,)): 1, (DET, (a,)): 1, (NN, (dog,)): 1
+
+2) (S, (NP, VP)): 1, (VP, (VT, NP)): 1, (NP, (DET, NN)): 1,
+(NP, (Fido,)): 1, (VT, (is,)): 1, (DET, (a,)): 1, (NN, cat): 1
+
+3) (S, (NP, VP)): 1, (VP, (VT, NP)): 1, (NP, (DET, NN)): 1,
+(NP, (Fido,)): 1, (VT, (is,)): 1, (DET, (a,)): 1, (NN, dog): 1
+
+4) (S, (NP, VP)): 1, (VP, (VT, NP)): 1, (NP, (DET, NN)): 1,
+(NP, (Fluffy,)): 1, (VT, (is,)): 1, (DET, (a,)): 1, (NN, cat): 1
+
+5) (S, (NP, VP)): 1, (VP, (VT, NP)): 1,
+(NP, (Fido,)): 1, (VT, (loves,)): 1, (NP, (Fluffy,)): 1
+
+6) (S, (NP, VP)): 1, (VP, (VI, ADV)): 1,
+(NP, (Fluffy,)):1, (VI, (sleeps,)): 1, (ADV, (soundly,)): 1
+
+
+So in total we have
+
+binary rules
+(S, (NP, VP)): 6
+(NP, (DET, NN)): 5
+(VP, (VT, NP)): 5
+(VP, (VI, ADV)): 1
+
+and unary rules
+(DET, (every,)): 1
+(NN, (cat,)): 3
+(VT, (loves,)): 2
+(DET, (a,)): 4
+(NN, (dog,)): 2
+(NP, (Fido,)): 3
+(VT, (is,)): 3
+(NP, (Fluffy,)): 3
+(VI, (sleeps,)): 1
+(ADV, (soundly,)): 1
+
+As a UNIV_COUNTS format file this could be
+
+6 S NP VP
+5 NP DET NN
+5 VP VT NP
+1 VP VI ADV
+1 DET every
+3 NN cat
+2 VT loves
+4 DET a
+2 NN dog
+3 NP Fido
+3 VT is
+3 NP Fluffy
+1 VI sleeps
+1 ADV soundly

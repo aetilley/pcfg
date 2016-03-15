@@ -1,0 +1,14 @@
+6 S NP VP
+5 NP DET NN
+5 VP VT NP
+1 VP VI ADV
+1 DET every
+3 NN cat
+2 VT loves
+4 DET a
+2 NN dog
+3 NP Fido
+3 VT is
+3 NP Fluffy
+1 VI sleeps
+1 ADV soundly
