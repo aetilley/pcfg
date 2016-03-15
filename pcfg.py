@@ -86,6 +86,10 @@ class Rule:
     
 
     def substitute(self, sub_dict):
+        """
+        Make substitutions (in the source or targets) according to dictionary sub_dict which has
+        Symbols as keys and Symbols as values.
+        """
         source = self.source()
         if source in sub_dict.keys():
             new_source = sub_dict[source]
@@ -102,6 +106,13 @@ class Rule:
         return new_rule
         
     def substitute_many(self, var, new_targs):
+        """
+        Perhaps currently poorly named, this method allows Not for more than one *kind* of substitution 
+        (as does the method substitute(), but rather for more than one symbol to be substituted 
+        in the place of one symbol (which substitute() does not currently allow).
+        The resulting Rule may therefore be of a different arity than that of the instance on which this 
+        method is called.
+        """
         assert type(new_targs) is tuple
         same_source = self.source()
         new_targets = ()
@@ -126,7 +137,10 @@ class Rule:
         return self._source.__str__() + " " + self._targets.__str__()
 
 class CFG:
-
+    """
+    A context free grammar.
+    """
+    
     def __init__(self, terminals = None, variables = None,
                  rules_of_arity = None, start_symbol = None):
         self._CFG = False
@@ -139,7 +153,7 @@ class CFG:
         """A dict of items with keys aritys and as values *sets* of *rules* of the key's arity."""
         self._n_ary_rules = rules_of_arity or dict()
         """ another dict where the indices are source Variables, 
-        and again, values are corresponding *sets* of *rules*"""
+        and again, values are corresponding *sets* of Rules"""
         self._rules_by_var = self.compute_rules_by_var()
 
         self._CFG = self.check_CFG()
@@ -147,8 +161,9 @@ class CFG:
             self._CNF = self.check_CNF()
 
     def compute_rules_by_var(self):
+        """ another dict where the indices are source Variables, 
+        and again, values are corresponding *sets* of Rules.  Assumes _n_ary_rules is correct."""
         result = dict()
-        # var in self.variables:
         for n in self._n_ary_rules.keys():
             for rule in self.get_rules_of_arity(n):
                 var = rule.source()
@@ -179,15 +194,14 @@ class CFG:
 
         #Check that every element in self.terminal is a Terminal
         for symbol in self.terminals:
-            p = (type(symbol) is Terminal)
+            p = type(symbol) is Terminal
             if not p:
                  print("Not every element in self.terminal is a Terminal")
                  result = False
 
-
         #Check that every element in self.variable is a Variable
         for symbol in self.variables:
-            p = (type(symbol) is Variable)
+            p = type(symbol) is Variable
             if not p:
                 print("Not every element of self.variable is a Variable.")
                 result = False
