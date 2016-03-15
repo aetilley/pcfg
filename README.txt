@@ -1,7 +1,7 @@
 
 (1) Basic Usage
 (2) File Types understood by self.train_from_file()
-
+(3) Coming soon
 ***
 
 (1) Basic Usage:
@@ -159,29 +159,46 @@ Out:
         or for this  transformation (for *ARYRULE)
         Assumes all "NONTERMINAL" come first.
 
-	file_type = "UNIV_COUNTS" is what it sounds like (COMING SOON!)
+	file_type = "UNIV_COUNTS" means the file format consists of lines of the form
+
+	N SOURCE TARGETS
+
+	where N is some non-negative integer, SOURCE is (an identifier for) some source Variable or Non-terminal,
+	and TARGETS is a list of zero or more (identifiers for) target symbols (either variables or terminals).
+	The idea here is that N is the number of times the rule from this SOURCE and to these TARGETS appears
+	in the semantic data (say a tree-bank) for our training corpus.
+
+	Also note that, as with UNIV_PCFG format, we do not devote separate lines to listing the variables,
+	and we do not list arities of the rule for the line. There is one and only one rule per line,
+	and the arity can be read off as the length of TARGETS.
+	And once again we make the simplifying assumptions that, while Non-terminals may appear as target symbols,
+	a specific instance of a Non-terminal symbol in the semantic corpus data will always correspond to
+	an instance of a rule where that occurence of the non-terminal is the Source.
+	Thus, in order to make a count of the total number of occurrences of a Non-terminal,
+	we only need to sum the counts for the rules with that Non-terminal as their source.
 
 
+An observation about file formats and training PCFGs:
 
-***
-
-An observation about training PCFGs:
 
 Notice that any file that could hope to uniquely train a complete PCFG object must determine a file
 in UNIV_PCFG format, and in this way UNIV_PCFG is a kind of universal receiver for training data
 set representations.
+
 In practice however, most data that we do obtain in UNIV_PCFG format will have come from some
 sort of "counts file" at some point in its creation by way of MLE parameter estimates.
 
-This means that at some point after we obtained the training corpus
-(1) There was a selection about legal rules; we can call the subset of allowable rules
+See derivation_example.txt for a simple example of how a counts file might be generated.  Whatever the details...at some point after we obtained the training corpus
+
+(1) a choice must be made about legal rules; we can call the subset of allowable rules
 the *signature* of the PCFG (consider for instance the CNF restrictions).  But even with our signature selected,
 (2) It is not enought to have a raw training corpus.  Rather we need semantic (parse) information
 about the corpus sufficient to record counts for all the rules in our signature.
 
 In order to do (2), there are really only two options.
 
-First, preferably, you obtain a manually annotated tree-bank of sentences in your corpus.
+First, preferably, you obtain a manually annotated tree-bank of sentences in your corpus
+(a special case being of course that your corpus was just the raw text from some tree-bank).
 From this it should not be too hard to write a program that reads this treebank in its
 local format and outputs a counts file.
 
@@ -189,35 +206,8 @@ The second alternative is to use yet another parser on your corpus to get suffic
 semantic information to write your counts file.  (This isn't totally crazy, and it might actually
 be interesting to experiment with bootstrapping these things, but that's for another day.)
 
-
-
 ***
 
-
-UNIV_COUNTS file format consists of lines of the form
-
-N SOURCE TARGETS
-
-where N is some non-negative integer, SOURCE is (an identifier for) some source Variable or Non-terminal,
-and TARGETS is a list of zero or more (identifiers for) target symbols (either variables or terminals).
-The idea here is that N is the number of times the rule from this SOURCE and to these TARGETS appears
-in the semantic data (say a tree-bank) for our training corpus.
-
-Also note that, as with UNIV_PCFG format, we do not devote separate lines to listing the variables,
-and we do not list arities of the rule for the line. There is one and only one rule per line,
-and the arity can be read off as the length of TARGETS.
-And once again we make the simplifying assumptions that, while Non-terminals may appear as target symbols,
-a specific instance of a Non-terminal symbol in the semantic corpus data will always correspond to
-an instance of a rule where that occurence of the non-terminal is the Source.  Thus, in order to make a count
-of the total number of occurrences of a Non-terminal, we only need to sum the counts for the rules with that
-Non-terminal as their source.
-
-Now to add functionality for reading UNIV_COUNTS...
-
-***
-
-
-
-Coming soon:
+(3) Coming soon:
 
 PCFG method for printing current state (in UNIV_PCFG file format)
