@@ -493,6 +493,7 @@ class PCFG(CFG):
                         target = Variable(symbol)
                     else:
                         target = Terminal(symbol)
+                        self.terminals.add(target)
                     targets = targets + (target,)
                 rule = Rule(source, targets)
                 #MLE Estimate
