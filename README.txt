@@ -115,6 +115,21 @@ Out:
   'tag': VP},
  'tag': S}
 
+> new_grammar = PCFG()
+Input data has wrong signature
+Valid CFG?:   False
+
+> new_grammar.train_from_file("data/toy_univ_counts.txt", file_type="UNIV_COUNTS")                          
+Training complete.  Running self-check...
+Valid CFG?:   True
+Valid Parameters?:   True
+CNF?:   True
+
+> new_grammar.score("Fluffy loves Fluffy")                                                                  
+Applying Inside algorithm...
+Final Score:   0.024793388429752063
+Out[]: 0.024793388429752063
+
 
 ***
 
