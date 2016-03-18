@@ -12,9 +12,15 @@ dump_target = open(DUMP_TARGET_NAME, 'w')
 #Select rev_ids to examine.
 IDS_FILE_NAME = "data.tsv"
 ids_file = open(IDS_FILE_NAME)
+#MAX_REVISIONS
 MAX_REVISIONS = 10
 rev_ids = []
 count = 0
+
+for line in ids_file:
+    
+
+#Notice we're only looking at first column of data from ids_file (namely, the column of ids)
 for line in ids_file:
     if count < MAX_REVISIONS:
         rev_ids.append(int(line.strip().split("\t")[0]))
@@ -34,7 +40,7 @@ revision.content_tokens
 FEATURE = diff.added_segments
 
 
-#Extract data from selected revisions and write to selected file
+# extract data from selected revisions and write to selected file
 extr = APIExtractor(mwapi.Session("https://en.wikipedia.org"))
 for id in rev_ids:
 
