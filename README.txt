@@ -123,13 +123,15 @@ Out:
 Input data has wrong signature
 Valid CFG?:   False
 
-> new_grammar.train_from_file("data/toy_univ_counts.txt", file_type="UNIV_COUNTS")                          
+> new_grammar.train_from_file("data/toy_univ_counts.txt", file_type="UNIV_COUNTS")
+
 Training complete.  Running self-check...
 Valid CFG?:   True
 Valid Parameters?:   True
 CNF?:   True
 
-> new_grammar.score("Fluffy loves Fluffy")                                                                  
+> new_grammar.score("Fluffy loves Fluffy")
+
 Applying Inside algorithm...
 Final Score:   0.024793388429752063
 Out[]: 0.024793388429752063
@@ -148,61 +150,61 @@ just by listing rules and their corresponding parameters
 
 For example the following file gives a complete description of a PCFG:
 
-        S .2
-        S S .2
-        S NP VP .6
-        NP DET NN .8
-        NP thomas .1
-        NP sally .1
-        DET the 1.
-        NN milkman 1.
-        VP VT NP .6
-        VP VI .4
-        VI runs 1.
-        VT greets 1.
-                
-        For any given line, that the first element (whitespace delimited element) is always
-	the source of the rule in question.  
-        The last element is always the probability of the transition from this source to the targets
-        The aforementioned targests are exactly the zero or more elements between
-        the first element and the last element of the line.
-        So for example the line S .2 would mean a 0-ary rule with source S and targets (), 
-        and that the conditional probability of this transition to () given S is .2.
-        Note also that every symbol that appears in the middle but never on the
-	left is assumed to be a Terminal
+S .2
+S S .2
+S NP VP .6
+NP DET NN .8
+NP thomas .1
+NP sally .1
+DET the 1.
+NN milkman 1.
+VP VT NP .6
+VP VI .4
+VI runs 1.
+VT greets 1.
+
+For any given line, that the first element (whitespace delimited element) is
+always the source of the rule in question.  
+The last element is always the probability of the transition from this source to the targets
+The aforementioned targests are exactly the zero or more elements between
+the first element and the last element of the line.
+So for example the line S .2 would mean a 0-ary rule with source S and targets (), 
+and that the conditional probability of this transition to () given S is .2.
+Note also that every symbol that appears in the middle but never on the
+left is assumed to be a Terminal
 
 
-        file_type = "CNF_COUNTS" means the grammar to be learned is in Chomsky Normal Form and
-        that the file contains lines of the form <count> <type> <args> where 
-        <type> is "NONTERMINAL", "UNARYRULE", or "BINARYRULE"
-        <args> are the corresponding one, two, or three Symbols, respectively.
-        <count> is some given empirical count for this Symbol (for NONTERMINAL) 
-        or for this  transformation (for *ARYRULE)
-        Assumes all "NONTERMINAL" come first.
+file_type = "CNF_COUNTS" means the grammar to be learned is in Chomsky Normal Form and
+that the file contains lines of the form <count> <type> <args> where 
+<type> is "NONTERMINAL", "UNARYRULE", or "BINARYRULE"
+<args> are the corresponding one, two, or three Symbols, respectively.
+<count> is some given empirical count for this Symbol (for NONTERMINAL) 
+or for this  transformation (for *ARYRULE)
+Assumes all "NONTERMINAL" come first.
 
-	file_type = "UNIV_COUNTS" means the file format consists of lines of the form
+file_type = "UNIV_COUNTS" means the file format consists of lines of the form
 
-	N SOURCE TARGETS
+N SOURCE TARGETS
 
-	where N is some non-negative integer, SOURCE is (an identifier for) some
-	source Variable or Non-terminal,
-	and TARGETS is a list of zero or more (identifiers for) target symbols
-	(either variables or terminals).
-	The idea here is that N is the number of times the rule from this SOURCE and to
-	these TARGETS appears
-	in the semantic data (say a tree-bank) for our training corpus.
+where N is some non-negative integer, SOURCE is (an identifier for) some
+source Variable or Non-terminal,
+and TARGETS is a list of zero or more (identifiers for) target symbols
+(either variables or terminals).
+The idea here is that N is the number of times the rule from this SOURCE and to
+these TARGETS appears
+in the semantic data (say a tree-bank) for our training corpus.
 
-	Also note that, as with UNIV_PCFG format, we do not devote separate lines to
-	listing the variables,
-	and we do not list arities of the rule for the line. There is one and only one rule per line,
-	and the arity can be read off as the length of TARGETS.
-	And once again we make the simplifying assumptions that, while Non-terminals may appear
-	as target symbols,
-	a specific instance of a Non-terminal symbol in the semantic corpus data will
-	always correspond to
-	an instance of a rule where that occurence of the non-terminal is the Source.
-	Thus, in order to make a count of the total number of occurrences of a Non-terminal,
-	we only need to sum the counts for the rules with that Non-terminal as their source.
+Also note that, as with UNIV_PCFG format, we do not devote separate lines to
+listing the variables,
+and we do not list arities of the rule for the line. There is one and only one rule per line,
+and the arity can be read off as the length of TARGETS.
+And once again we make the simplifying assumptions that, while Non-terminals may appear
+as target symbols,
+a specific instance of a Non-terminal symbol in the semantic corpus data will
+always correspond to
+an instance of a rule where that occurence of the non-terminal is the Source.
+Thus, in order to make a count of the total number of occurrences of a Non-terminal,
+we only need to sum the counts for the rules with that Non-terminal as their source.
 
 ***
 
@@ -216,7 +218,9 @@ set representations.
 In practice however, most data that we do obtain in UNIV_PCFG format will have come from some
 sort of "counts file" at some point in its creation by way of MLE parameter estimates.
 
-See derivation_example.txt for a simple example of how a counts file might be generated.  Whatever the details...at some point after we obtained a training corpus, since it is not enought to hae a raw training corpus
+See derivation_example.txt for a simple example of how a counts file might be generated.
+Whatever the details...at some point after we obtained a training corpus,
+since it is not enought to have a raw training corpus
 
 (1) a choice must be made about legal rules; we can call the subset of allowable rules
 the *signature* of the PCFG (consider for instance the CNF restrictions).
