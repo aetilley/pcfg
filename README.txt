@@ -239,6 +239,8 @@ generally treating them as weak learners for some ensemble method.)
 
 ***
 
-(4) Coming soon:
+(4) Coming soon / More Info:
 
-Contact Arthur at aetilley at gmail dot com.
+
+
+Contact aetilley at gmail dot com.
