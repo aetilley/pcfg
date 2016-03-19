@@ -2,7 +2,8 @@
 (1) Basic Usage
 (2) File Types understood by self.train_from_file()
 (3) A note on file types and training PCFGs.
-(4) Coming soon
+(4) Coming Soon / More info
+
 ***
 
 (1) Basic Usage:
@@ -42,6 +43,8 @@ Out[]:
   'right_branch': {'tag': NP+PRON, 'terminal': her},
   'tag': VP},
  'tag': S}
+ 
+> cnf_grammar.print_pcfg("univ_pcfg_format.txt")
 
 > other_grammar = PCFG()
 Input data has wrong signature
@@ -231,11 +234,14 @@ local format and outputs a counts file.
 
 The second alternative is to use yet another parser on our corpus to get sufficient
 semantic information to write your counts file.
-(It might actually be interesting to experiment with bootstrapping these things or
-generally treat them as weak learners for some ensemble method.)
+(It might be interesting to experiment with bootstrapping these parser objects or
+generally treating them as weak learners for some ensemble method.)
 
 ***
 
 (4) Coming soon:
 
 PCFG method for printing current state (in UNIV_PCFG file format)
+
+
+Contact Arthur at aetilley at gmail dot com.

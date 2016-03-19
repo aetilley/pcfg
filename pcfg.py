@@ -354,7 +354,8 @@ class PCFG(CFG):
                     
         print("Valid Parameters?:  ", result)
         return result
-    
+    def add_rule(self, rule):
+        super().add_rule(rule)
     def remove_rule(self, rule):
         super().remove_rule(rule)
         self._q.pop(rule)
@@ -365,12 +366,27 @@ class PCFG(CFG):
     def q(self, rule):
         return self._q[rule]
 
-    #There should be a similar function outputing a UNIV_PCFG format file for the pcfg
-    def print_all_rules_and_params(self):
-        for n in self._n_ary_rules.keys():
+    def print_pcfg(self, new_file_path = None):
+        WRITE_FILE_NAME = new_file_path or "univ_pcfg_0.txt"
+        write_file = open(WRITE_FILE_NAME, 'w')
+
+        arities = list(self._n_ary_rules.keys())
+        arities.sort()
+        arities.reverse()
+        
+        for n in arities:
             for rule in self.get_rules_of_arity(n):
-                print("Rule: ",rule)
-                print("parameter: ",self.q(rule))
+                source = rule.source()
+                targets = rule.targets()
+                q = self.q(rule)
+                write_file.write(source._symbol_code)
+                write_file.write(" ")
+                for target in targets:
+                    write_file.write(target._symbol_code)
+                    write_file.write(" ")
+                write_file.write(str(q))
+                write_file.write("\n")
+        write_file.close()
     
     def train_from_file(self, file_path, file_type = "CNF_COUNTS"):
         """
