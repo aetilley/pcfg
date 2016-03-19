@@ -388,7 +388,7 @@ class PCFG(CFG):
                 write_file.write("\n")
         write_file.close()
     
-    def train_from_file(self, file_path, file_type = "CNF_COUNTS"):
+    def train_from_file(self, file_path, file_type):
         """
         This function is meant to act on a variety of data file formats in order to
  
@@ -425,38 +425,34 @@ class PCFG(CFG):
         the first element and the last element of the line.
         So for example the first line above would mean a 0-ary rule with source S and targets (), 
         and that the conditional probability of this transition to () given S is .2.
-        Note that, while a Variable (Non-terminal) may appear in the middle postions, every symbol that appears
+        Note that, while a Variable (Non-terminal) may appear in the middle postions, 
+        every symbol that appears
         in the middle and never on the left is assumed to be a Terminal.
-
-        <Scheduled for Deletion>
-        file_type = "CNF_COUNTS" means the grammar to be learned is in Chomsky Normal Form and
-        that the file contains lines of the form <count> <type> <args> where 
-        <type> is "NONTERMINAL", "UNARYRULE", or "BINARYRULE"
-        <args> are the corresponding one, two, or three Symbols, respectively.
-        <count> is some given empirical count for this Symbol (for NONTERMINAL) 
-        or for this  transformation (for *ARYRULE)
-        Assumes all "NONTERMINAL" come first.
 
         UNIV_COUNTS file format consists of lines of the form
 
         N SOURCE TARGETS
 
-        where N is some non-negative integer, SOURCE is (an identifier for) some source Variable or Non-terminal, 
-        and TARGETS is a list of zero or more (identifiers for) target symbols (either variables or terminals).
-        The idea here is that N is the number of times the rule from this SOURCE and to these TARGETS appears 
-        in the semantic data (say a tree-bank) for our training corpus.
-
-        Also note that, as with UNIV_PCFG format, we do not devote separate lines to listing the variables,
-        and we do not list arities of the rule for the line. There is one and only one rule per line,
+        where N is some non-negative integer, SOURCE is (an identifier for) some 
+        source Variable or Non-terminal, 
+        and TARGETS is a list of zero or more (identifiers for) target symbols
+        (either variables or terminals).
+        The idea here is that N is the number of times the rule from this SOURCE 
+        and to these TARGETS appears in the semantic data (say a tree-bank) for our training corpus.
+        Also note that, as with UNIV_PCFG format, we do not devote separate
+        lines to listing the variables,
+        and we do not list arities of the rule for the line. There is one and only 
+        one rule per line,
         and the arity can be read off as the length of TARGETS.
-        And once again we make the simplifying assumptions that, while Non-terminals may appear as target symbols,
-        a specific instance of a Non-terminal symbol in the semantic corpus data will always correspond to
+        And once again we make the simplifying assumptions that, while Non-terminals 
+        may appear as target symbols,
+        a specific instance of a Non-terminal symbol in the semantic corpus data will 
+        always correspond to
         an instance of a rule where that occurence of the non-terminal is the Source. 
         Thus, in order to make a count of the total number of occurrences of a Non-terminal, 
         we only need to sum the counts for the rules with that Non-terminal as their source.
         """
 
-        
         #file_type: UNIV_PCFG
         if file_type == "UNIV_PCFG":
         # Double Read
@@ -486,6 +482,7 @@ class PCFG(CFG):
         #file_type:  UNIV_COUNTS
         elif file_type == "UNIV_COUNTS":
             variable_sums = dict()
+            #Double read
             for l in read_lines(file_path):
                 count = int(l[0])
                 source_symbol = l[1]
@@ -516,42 +513,7 @@ class PCFG(CFG):
                 q = count / variable_sums[source_symbol]
                 self.add_rule(rule)
                 self.set_q(rule, q)
-                
-                """
-                #<scheduled for deletion>
-                file_type: CNF_COUNTS
-                elif file_type == "CNF_COUNTS":
 
-            variable_counts = dict()
-            
-            for l in read_lines(file_path):
-                count = int(l[0])
-                type = l[1]
-                vals = l[2:]
-
-                if type == 'NONTERMINAL':
-                    new_var = Variable(vals[0])
-                    variable_counts[new_var] = count
-                    self.variables.add(new_var)
-                else:
-                    source = Variable(vals[0])
-    
-                    if len(vals) == 2:
-                        new_term = Terminal(vals[1])
-                        self.terminals.add(new_term)
-                        targets = (new_term,)
-                
-                    else:
-                        targets = ()
-                        for val in vals[1:]:
-                            targets = targets + (Variable(val),)
-
-                    rule = Rule(source, targets)
-                    self.add_rule(rule)
-                    #Record Conditional probability of the transition given the source
-                    q = count / variable_counts[source]
-                    self.set_q(rule, q)
-        """
         else:
             print("Unknown file_type parameter.")
             
@@ -561,10 +523,6 @@ class PCFG(CFG):
         if self._CFG:
             self.check_q()
             self._CNF = self.check_CNF()
-
-
-
-
 
 #
 #
