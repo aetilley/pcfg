@@ -14,7 +14,6 @@
 Input data has wrong signature
 Valid CFG?:  False
 
-
 > grammar.train_from_file("data/toy_univ_counts.txt", file_type="UNIV_COUNTS")
 Training complete.  Running self-check...
 Valid CFG?:   True
@@ -30,8 +29,6 @@ Out: True
 CNF?:  True
 Out: True
 
-
-
 > grammar.score("Fluffy loves Fluffy")
 Applying Inside algorithm...
 Final Score:   0.024793388429752063
@@ -46,7 +43,7 @@ Out:
   'tag': VP},
  'tag': S}
  
-> cnf_grammar.print_pcfg("data/univ_pcfg_out_0.txt")
+> grammar.print_pcfg("data/univ_pcfg_out_0.txt")
 
 > other_grammar = PCFG()
 Input data has wrong signature
@@ -95,7 +92,6 @@ Applying Inside algorithm...
 Final Score:   0.0015844273426889994
 Out: 0.0015844273426889994
 
-
 > other_grammar.parse("thomas greets sally")                                                     
 Applying CKY algorithm...
 Out:
@@ -129,7 +125,11 @@ Out:
 
 (2) File Types understood by self.train_from_file:
 
-file_type = "UNIV_PCFG" uses the assumptions that, in any description of a PCFG:
+(i) UNIV_PCFG
+(ii) UNIV_COUNTS
+
+
+(i) file_type = "UNIV_PCFG" uses the assumptions that, in any description of a PCFG:
 1)  All variables should be the source of some rule and,
 2)  The sources of all rules should be known variables, thus
 in particular we find that we can  determine a PCFG
@@ -161,15 +161,7 @@ Note also that every symbol that appears in the middle but never on the
 left is assumed to be a Terminal
 
 
-file_type = "CNF_COUNTS" means the grammar to be learned is in Chomsky Normal Form and
-that the file contains lines of the form <count> <type> <args> where 
-<type> is "NONTERMINAL", "UNARYRULE", or "BINARYRULE"
-<args> are the corresponding one, two, or three Symbols, respectively.
-<count> is some given empirical count for this Symbol (for NONTERMINAL) 
-or for this  transformation (for *ARYRULE)
-Assumes all "NONTERMINAL" come first.
-
-file_type = "UNIV_COUNTS" means the file format consists of lines of the form
+(ii) file_type = "UNIV_COUNTS" means the file format consists of lines of the form
 
 N SOURCE TARGETS
 
