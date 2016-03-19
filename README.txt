@@ -44,7 +44,7 @@ Out[]:
   'tag': VP},
  'tag': S}
  
-> cnf_grammar.print_pcfg("univ_pcfg_format.txt")
+> cnf_grammar.print_pcfg("univ_pcfg_out.txt")
 
 > other_grammar = PCFG()
 Input data has wrong signature
