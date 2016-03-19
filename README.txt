@@ -14,37 +14,39 @@
 Input data has wrong signature
 Valid CFG?:  False
 
->  cnf_grammar.train_from_file("data/toy_cnf_counts", file_type="CNF_COUNTS")
+
+> grammar.train_from_file("data/toy_univ_counts.txt", file_type="UNIV_COUNTS")
 Training complete.  Running self-check...
 Valid CFG?:   True
 Valid Parameters?:   True
 CNF?:   True
 
-
-> cnf_grammar.check_PCFG()
+> grammar.check_PCFG()
 Valid CFG?: True
 Valid Parameters?: True
 Out: True
 
-> cnf_grammar.check_CNF()
+> grammar.check_CNF()
 CNF?:  True
 Out: True
 
->  cnf_grammar.score("I cited her")
-Applying Inside algorithm...
-Final Score:   1.657968137022819e-11
-Out[]: 1.657968137022819e-11
 
->  cnf_grammar.parse("I cited her")
+
+> grammar.score("Fluffy loves Fluffy")
+Applying Inside algorithm...
+Final Score:   0.024793388429752063
+Out: 0.024793388429752063
+
+> grammar.parse("Fluffy loves Fluffy")                                                           
 Applying CKY algorithm...
-Out[]: 
-{'left_branch': {'tag': NP+PRON, 'terminal': I},
- 'right_branch': {'left_branch': {'tag': VERB, 'terminal': cited},
-  'right_branch': {'tag': NP+PRON, 'terminal': her},
+Out: 
+{'left_branch': {'tag': NP, 'terminal': Fluffy},
+ 'right_branch': {'left_branch': {'tag': VT, 'terminal': loves},
+  'right_branch': {'tag': NP, 'terminal': Fluffy},
   'tag': VP},
  'tag': S}
  
-> cnf_grammar.print_pcfg("univ_pcfg_out.txt")
+> cnf_grammar.print_pcfg("data/univ_pcfg_out_0.txt")
 
 > other_grammar = PCFG()
 Input data has wrong signature
@@ -119,25 +121,10 @@ Out:
   'tag': VP},
  'tag': S}
 
-> new_grammar = PCFG()
-Input data has wrong signature
-Valid CFG?:   False
-
-> new_grammar.train_from_file("data/toy_univ_counts.txt", file_type="UNIV_COUNTS")
-
-Training complete.  Running self-check...
-Valid CFG?:   True
-Valid Parameters?:   True
-CNF?:   True
-
-> new_grammar.score("Fluffy loves Fluffy")
-
-Applying Inside algorithm...
-Final Score:   0.024793388429752063
-Out[]: 0.024793388429752063
 
 
 ***
+
 
 
 (2) File Types understood by self.train_from_file:
