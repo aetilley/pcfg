@@ -82,7 +82,7 @@ class PCFG(CFG):
     def q(self, rule):
         return self._q[rule]
 
-    def print_pcfg(self, new_file_path = None):
+    def write_pcfg(self, new_file_path = None):
         """Create a file with name and location given by new_file_path giving the 
         complete data for this pcfg object in UNIV_PCFG file format."""
         

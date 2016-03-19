@@ -43,7 +43,7 @@ Out:
   'tag': VP},
  'tag': S}
  
-> grammar.print_pcfg("data/univ_pcfg_out_0.txt")
+> grammar.write_pcfg("data/univ_pcfg_out_0.txt")
 
 > other_grammar = PCFG()
 Input data has wrong signature
