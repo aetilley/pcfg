@@ -241,7 +241,4 @@ generally treating them as weak learners for some ensemble method.)
 
 (4) Coming soon:
 
-PCFG method for printing current state (in UNIV_PCFG file format)
-
-
 Contact Arthur at aetilley at gmail dot com.
