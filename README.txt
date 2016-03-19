@@ -10,7 +10,7 @@
 
 >  from pcfg import PCFG
 
->  cnf_grammar = PCFG()
+>  grammar = PCFG()
 Input data has wrong signature
 Valid CFG?:  False
 
