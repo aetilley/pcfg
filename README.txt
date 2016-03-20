@@ -151,14 +151,16 @@ VI runs 1.
 VT greets 1.
 
 For any given line, that the first element (whitespace delimited element) is
-always the source of the rule in question.  
-The last element is always the probability of the transition from this source to the targets
-The aforementioned targests are exactly the zero or more elements between
+always the (identifier for the) source of the rule in question.  
+The last element is always a floating point literal for the probability of the transition
+from this source to the targets
+The aforementioned (indentifiers for the) target Symbols are exactly the zero or more symbols between
 the first element and the last element of the line.
-So for example the line S .2 would mean a 0-ary rule with source S and targets (), 
-and that the conditional probability of this transition to () given S is .2.
-Note also that every symbol that appears in the middle but never on the
-left is assumed to be a Terminal
+Notice in particular the line S .2 would refer to a 0-ary rule with source S and targets (),
+(the empty target list) and indicate that the conditional probability of this transition
+to () given S is .2.
+Note also that every symbol that appears in the middle but never on the left can be assumed
+to be a Terminal.
 
 
 (ii) file_type = "UNIV_COUNTS" means the file format consists of lines of the form
