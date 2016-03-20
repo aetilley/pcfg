@@ -1,5 +1,8 @@
-from digraph import Digraph
-from cfg import Symbol, Variable, Terminal, Rule, CFG
+from .digraph import Digraph
+from .rule import Rule
+from .symbol import Variable, Symbol, Terminal
+from .cfg import CFG
+
 
 TOLERANCE = .00000000000001
 START_SYMBOL_CODE = "S"

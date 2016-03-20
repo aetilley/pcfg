@@ -8,7 +8,7 @@
 
 (1) Basic Usage:
 
->  from pcfg import PCFG
+>  from src.pcfg import PCFG
 
 >  grammar = PCFG()
 Input data has wrong signature
