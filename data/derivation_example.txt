@@ -8,23 +8,18 @@ Raw corpus:
 
 Semantic Data (Tagged and Parsed):
 
-1) ((Every/DET cat/NN)/NP (loves/VT (a/DET dog/NN)/NP)/VP )/S
-
-2) (Fido/NP (is/VT (a/DET cat/NN)/NP)/VP)/S
-
-3) (Fido/NP (is/VT (a/DET dog/NN)/NP)/VP)/S
-
-4) (Fluffy/NP (is/VT (a/DET cat/NN)/NP)/VP)/S
-
-5) (Fido/NP (loves/VT Fluffy/NP)/VP)/S
-
-6) (Fluffy/NP (sleeps/VI soundly/ADV)/VP))/S
+1) (S (NP (DET Every) (NN cat)) (VP (VT loves) (NP (DET a) (NN dog))))
+2) (S (NP Fido) (VP (VT is) (NP (DET a) (NN cat))))
+3) (S (NP Fido) (VP (VT is) (NP (DET a) (NN dog))))
+4) (S (NP Fluffy) (VP (VT is) (NP (DET a) (NN cat))))
+5) (S (NP Fido) (VP (VT loves) (NP Fluffy)))
+6) (S (NP Fluffy) (VP (VI sleeps) (ADV soundly)))
 
 
 Computing rule counts by line:
 
 1) (S, (NP, VP)): 1, (NP, (DET, NN)): 2, (VP, (VT, NP)): 1,
-(DET, (every,)): 1, (NN, (cat,)): 1, (VT, (loves,)): 1, (DET, (a,)): 1, (NN, (dog,)): 1
+(DET, (Every,)): 1, (NN, (cat,)): 1, (VT, (loves,)): 1, (DET, (a,)): 1, (NN, (dog,)): 1
 
 2) (S, (NP, VP)): 1, (VP, (VT, NP)): 1, (NP, (DET, NN)): 1,
 (NP, (Fido,)): 1, (VT, (is,)): 1, (DET, (a,)): 1, (NN, cat): 1
@@ -51,7 +46,7 @@ binary rules
 (VP, (VI, ADV)): 1
 
 and unary rules
-(DET, (every,)): 1
+(DET, (Every,)): 1
 (NN, (cat,)): 3
 (VT, (loves,)): 2
 (DET, (a,)): 4

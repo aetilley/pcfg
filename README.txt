@@ -2,7 +2,8 @@
 (1) Basic Usage
 (2) File Types understood by self.train_from_file()
 (3) A note on file types and training PCFGs.
-(4) Coming Soon / More info
+(4) UNIV_TREE file format
+(5) Coming Soon / More info
 
 ***
 
@@ -118,6 +119,29 @@ Out:
  'tag': S}
 
 
+> g1 = PCFG()
+Input data has wrong signature
+Valid CFG?:   False
+
+> g2 = PCFG()
+Input data has wrong signature
+Valid CFG?:   False
+
+> g1.train_from_file("data/toy_univ_counts.txt", file_type = "UNIV_COUNTS")
+Training complete.  Running self-check...
+Valid CFG?:   True
+Valid Parameters?:   True
+CNF?:   True
+
+> g2.train_from_file("data/toy_univ_tree.txt", file_type = "UNIV_TREE")
+Training complete.  Running self-check...
+Valid CFG?:   True
+Valid Parameters?:   True
+CNF?:   True
+
+> g1 == g2
+Out: True
+
 
 ***
 
@@ -224,8 +248,36 @@ generally treating them as weak learners for some ensemble method.)
 
 ***
 
-(4) Coming soon / More Info:
+(4)
+
+To define UNIV_TREE format, we first define what a tree-expression is
+ a tree-expression is any character string that follows the recursive definition
+
+(i) And lone (identifier for a) Terminal
+
+<terminal>
+
+is a tree-expression (of depth zero)
+
+(ii) Given N a non-negative integer (possibly zero), and given N tree-expressions
+<tree1>, <tree2>, ... , <treeN>, of depths d1, d2, ..., dN,
+and given <symbol> a (identifier for a) Variable symbol, the character string
+
+(<symbol> <tree1> <tree2> ... <treeN>)
+
+is a tree-expression (of depth 1 + max{d1, d2, ..., dN})
+
+where we take max{} = 0 so that the tree-expression (S) has depth 1, as does, say,
+(S Damn) if Damn is in our set of Terminals.
+
+Finally, we say a file is in UNIV_TREE format, if every line consists of exactly one
+tree-expression of positive depth.
+***
 
 
 
-Contact aetilley at gmail dot com.
+(5) Coming soon / More Info:
+
+
+
+(contact aetilley at gmail dot com)

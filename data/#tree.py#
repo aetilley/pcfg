@@ -1,0 +1,51 @@
+class Tree:
+    """
+    Every has a symbol and a list of children.  A node with no children 
+    (and only these) may be terminal but not all nodes with no children are terminal.
+    """
+    def __init__(self, expr):
+        if expr[0] != "(":
+            self.terminal = True
+            self.children = list()
+            self.label = expr
+        else:
+            self.terminal = False
+            inside = expr[1:-1]
+            rough_split = inside.strip().split(" ")
+            label = rough_split[0]
+            curr_expr = ""
+            children = list()
+            rest = inside[len(label)+1:]
+            l_paren_count = 1
+            r_paren_count = 0
+            char_ind = 1
+            
+            while l_paren_count > r_paren_count:
+                
+                expr[current_char_ind]
+                
+            whil
+
+    def to_expr(self):
+        if self.terminal:
+            return self.label
+        else:
+            result = "(" + self.label
+            for child in self.children:
+                result += (" " + child.to_expr())
+            result += ")"
+            return result
+    
+    def add_counts_to(self, counts):
+    source_symbol = tree.root()
+    target_symbols = ()
+    for child in tree.children():
+        head_symbol = process_counts(child, counts)
+        target_symbols = target_symbols + (head_symbol,)
+    current_rule = (source_symbol, target_symbols)
+    if current_rule in counts.keys():
+        counts[current_rule] += 1
+    else:
+        counts[current_rule] = 1
+    return source_symbol
+#

@@ -1,3 +1,4 @@
+from .tree import Tree
 from .digraph import Digraph
 from .rule import Rule
 from .symbol import Variable, Symbol, Terminal
@@ -109,7 +110,60 @@ class PCFG(CFG):
                 write_file.write(str(q))
                 write_file.write("\n")
         write_file.close()
+
+    def __eq__(self, other):
+        return self._n_ary_rules == other._n_ary_rules and \
+            self._q == other._q and \
+            self._rules_by_var == other._rules_by_var and \
+            self.variables == other.variables and \
+            self.terminals == other.terminals
     
+
+
+
+
+        
+
+    def train_from_counts_dict(self, counts):
+        """
+        Assumes counts keys are Rules with generic targets (possibly
+        Symbols not Terminals or Variables) and the items have integer values
+        """
+
+        variable_counts = dict() #A dict with keys Variables and values counts
+
+        #Double read
+        for rule in counts.keys():
+            count = counts[rule]
+            source = rule.source()
+            if source in variable_counts.keys():
+                variable_counts[source] += count
+            else:
+                variable_counts[source] = count
+                self.variables.add(source)
+
+        for rule in counts.keys():
+            count = counts[rule]
+            source = rule.source()
+            targets = rule.targets()
+            arity = rule.arity()
+            new_targets = ()
+            for target in targets:
+                symbol = target._symbol_code
+                new_var = Variable(symbol)
+                if new_var in self.variables:
+                    new_targets += (new_var,)
+                else:
+                    new_term = Terminal(symbol)
+                    new_targets += (new_term,)
+                    self.terminals.add(new_term)
+            rule = Rule(source, new_targets)
+            #MLE Estimate
+            q = count / variable_counts[source]
+            self.add_rule(rule)
+            self.set_q(rule, q)
+
+            
     def train_from_file(self, file_path, file_type):
         """
         This function is meant to act on a variety of data file formats in order to
@@ -203,39 +257,31 @@ class PCFG(CFG):
 
         #file_type:  UNIV_COUNTS
         elif file_type == "UNIV_COUNTS":
-            variable_sums = dict()
-            #Double read
+            d = dict()
             for l in read_lines(file_path):
                 count = int(l[0])
                 source_symbol = l[1]
-                if source_symbol in variable_sums.keys():
-                    variable_sums[source_symbol] += count
-                else:
-                    variable_sums[source_symbol] = count
-                    source = Variable(source_symbol)
-                    self.variables.add(source)
-
-            for l in read_lines(file_path):
-                count = int(l[0])
-                source_symbol = l[1]
-                target_symbols = l[2:]
-                arity = len(target_symbols)
                 source = Variable(source_symbol)
+                target_symbols = l[2:]
                 targets = ()
-                for symbol in target_symbols:
-                    #Check if symbol is Terminal or Non-Terminal
-                    if symbol in variable_sums.keys():
-                        target = Variable(symbol)
-                    else:
-                        target = Terminal(symbol)
-                        self.terminals.add(target)
-                    targets = targets + (target,)
+                for target_symbol in target_symbols:
+                    symbol = Symbol(target_symbol)
+                    targets += (symbol,)
                 rule = Rule(source, targets)
-                #MLE Estimate
-                q = count / variable_sums[source_symbol]
-                self.add_rule(rule)
-                self.set_q(rule, q)
+                d[rule] = count
+            self.train_from_counts_dict(d)
 
+
+                    
+        #UNIV_TREE file type
+        elif(file_type == "UNIV_TREE"):
+            counts = dict()
+            file = open(file_path, 'r')
+            for l in file:
+                tree = Tree(l)
+                tree.add_counts_return_label(counts)
+            self.train_from_counts_dict(counts)
+            #Now proceed as in UNIV_COUNTS
         else:
             print("Unknown file_type parameter.")
             
@@ -246,9 +292,29 @@ class PCFG(CFG):
             self.check_q()
             self._CNF = self.check_CNF()
 
-#
-#
-#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+
 #Begin helper functions for main conversion function
             
     def add_term_variables(self):
@@ -536,6 +602,15 @@ class PCFG(CFG):
         
 
 
+
+
+
+
+
+
+
+
+#Begin Parse / Score methods
 
 
             

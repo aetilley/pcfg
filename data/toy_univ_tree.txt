@@ -1,0 +1,6 @@
+(S (NP (DET Every) (NN cat)) (VP (VT loves) (NP (DET a) (NN dog))))
+(S (NP Fido) (VP (VT is) (NP (DET a) (NN cat))))
+(S (NP Fido) (VP (VT is) (NP (DET a) (NN dog))))
+(S (NP Fluffy) (VP (VT is) (NP (DET a) (NN cat))))
+(S (NP Fido) (VP (VT loves) (NP Fluffy)))
+(S (NP Fluffy) (VP (VI sleeps) (ADV soundly)))

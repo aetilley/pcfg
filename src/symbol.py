@@ -1,8 +1,8 @@
 
 class Symbol:
     
-    def __init__(self):
-        self._symbol_code = None
+    def __init__(self, symbol_code):
+        self._symbol_code = symbol_code
 
     def __str__(self):
         return self._symbol_code
