@@ -283,12 +283,12 @@ In order to do (2), there are really only two options.
 First, preferably, we obtain a manually annotated tree-bank of sentences in our corpus
 (a special case being of course that our corpus was just the raw text from some tree-bank).
 From this it should not be too hard to write a program that reads this treebank in its
-local format and outputs a counts file.
+local format and outputs a counts file or another tree-bank (see UNIV_COUNTS and UNIV_TREE formats).
 
 The second alternative is to use yet another parser on our corpus to get sufficient
 semantic information to write your counts file.
-(It might be interesting to experiment with bootstrapping these parser objects or
-generally treating them as weak learners for some ensemble method.)
+(It might be interesting to experiment with boosting PCFG objects or
+more generally treating them as weak learners for some ensemble method.)
 
 ***
 
