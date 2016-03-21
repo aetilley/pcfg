@@ -217,17 +217,14 @@ these TARGETS appears
 in the semantic data (say a tree-bank) for our training corpus.
 
 Also note that, as with UNIV_PCFG format, we do not devote separate lines to
-listing the variables,
-and we do not list arities of the rule for the line. There is one and only one rule per line,
-and the arity can be read off as the length of TARGETS.
-And once again we make the simplifying assumptions that, while Non-terminals may appear
-as target symbols,
-a specific instance of a Non-terminal symbol in the semantic corpus data will
-always correspond to
+listing the variables, and we do not list arities of the rule for the line.
+There is one and only one rule per line,
+and the arity can be read off as the length of TARGETS. And once again we make the
+simplifying assumptions that, while Non-terminals may appear as target symbols, a specific
+instance of a Non-terminal symbol in the semantic corpus data will always correspond to
 an instance of a rule where that occurence of the non-terminal is the Source.
 Thus, in order to make a count of the total number of occurrences of a Non-terminal,
 we only need to sum the counts for the rules with that Non-terminal as their source.
-
 
 (iii) UNIV_TREE
 

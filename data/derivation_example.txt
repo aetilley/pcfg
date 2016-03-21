@@ -91,8 +91,8 @@ For instance, summing over all rules in which NP is the source gives
 count(NP) = count(NP, (DET, NN)) + count(NP, (Fido,)) + count(NP, (Fluffy,)) = 5 + 3 + 3 = 11
 
 Since the rule (NP, (DET, NN)) occurs exactly 5 times, we  estimate the parameter
-for (NP (DET NN)) to be 5/11 (think of this as the conditional probability of
-transitioning to (DET NN) from NP).
+for (NP (DET NN)) to be 5/11 = .454545...
+(Think of this as the conditional probability of transitioning to (DET NN) from (given) NP.)
 Proceeding in this way, computing sums for all Variables and computing MLE estimates
 for all rules in the counts file gives
 
@@ -112,4 +112,3 @@ NP Fido 0.2727272727272727
 VT loves 0.4
 
 (This is exactly the contents of the file data/toy_univ_pcfg.txt.)
-
