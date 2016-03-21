@@ -1,3 +1,5 @@
+It all starts with a
+
 Raw corpus:
 1) Every cat loves a dog
 2) Fido is a cat
@@ -6,17 +8,22 @@ Raw corpus:
 5) Fido loves Fluffy
 6) Fluffy sleeps soundly
 
+If we're luckly, our raw corpus has associated
+
 Semantic Data (Tagged and Parsed):
 
-1) (S (NP (DET Every) (NN cat)) (VP (VT loves) (NP (DET a) (NN dog))))
-2) (S (NP Fido) (VP (VT is) (NP (DET a) (NN cat))))
-3) (S (NP Fido) (VP (VT is) (NP (DET a) (NN dog))))
-4) (S (NP Fluffy) (VP (VT is) (NP (DET a) (NN cat))))
-5) (S (NP Fido) (VP (VT loves) (NP Fluffy)))
-6) (S (NP Fluffy) (VP (VI sleeps) (ADV soundly)))
+(S (NP (DET Every) (NN cat)) (VP (VT loves) (NP (DET a) (NN dog))))
+(S (NP Fido) (VP (VT is) (NP (DET a) (NN cat))))
+(S (NP Fido) (VP (VT is) (NP (DET a) (NN dog))))
+(S (NP Fluffy) (VP (VT is) (NP (DET a) (NN cat))))
+(S (NP Fido) (VP (VT loves) (NP Fluffy)))
+(S (NP Fluffy) (VP (VI sleeps) (ADV soundly)))
 
+(the above semantic data is exactly the contents of data/toy_univ_tree.txt)
 
-Computing rule counts by line:
+(If your raw data does not have associated semantic data, you need to either parse the raw data by hand or use another parser.)
+
+Once we have the semantic data, we can compute rule counts line by line:
 
 1) (S, (NP, VP)): 1, (NP, (DET, NN)): 2, (VP, (VT, NP)): 1,
 (DET, (Every,)): 1, (NN, (cat,)): 1, (VT, (loves,)): 1, (DET, (a,)): 1, (NN, (dog,)): 1
@@ -35,7 +42,6 @@ Computing rule counts by line:
 
 6) (S, (NP, VP)): 1, (VP, (VI, ADV)): 1,
 (NP, (Fluffy,)):1, (VI, (sleeps,)): 1, (ADV, (soundly,)): 1
-
 
 So in total we have
 
@@ -57,13 +63,14 @@ and unary rules
 (VI, (sleeps,)): 1
 (ADV, (soundly,)): 1
 
+
 As a UNIV_COUNTS format file this could be
 
 6 S NP VP
 5 NP DET NN
 5 VP VT NP
 1 VP VI ADV
-1 DET every
+1 DET Every
 3 NN cat
 2 VT loves
 4 DET a
@@ -73,3 +80,36 @@ As a UNIV_COUNTS format file this could be
 3 NP Fluffy
 1 VI sleeps
 1 ADV soundly
+
+(This is exactly the contents of the file data/toy_univ_counts.txt.)
+
+Lastly, we may use the rule counts to compute Variable counts and then compute
+MLE parameter extimates
+for each rule.
+For instance, summing over all rules in which NP is the source gives
+
+count(NP) = count(NP, (DET, NN)) + count(NP, (Fido,)) + count(NP, (Fluffy,)) = 5 + 3 + 3 = 11
+
+Since the rule (NP, (DET, NN)) occurs exactly 5 times, we  estimate the parameter
+for (NP (DET NN)) to be 5/11 (think of this as the conditional probability of
+transitioning to (DET NN) from NP).
+Proceeding in this way, computing sums for all Variables and computing MLE estimates
+for all rules in the counts file gives
+
+NP DET NN 0.45454545454545453
+S NP VP 1.0
+VP VI ADV 0.16666666666666666
+VP VT NP 0.8333333333333334
+DET Every 0.2
+NN cat 0.6
+NN dog 0.4
+VT is 0.6
+NP Fluffy 0.2727272727272727
+VI sleeps 1.0
+ADV soundly 1.0
+DET a 0.8
+NP Fido 0.2727272727272727
+VT loves 0.4
+
+(This is exactly the contents of the file data/toy_univ_pcfg.txt.)
+

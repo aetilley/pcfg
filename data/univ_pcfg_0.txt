@@ -1,0 +1,20 @@
+S I love NP 0.1
+PP on NP 0.5
+NP DET NN 0.5
+VP VP PP 0.4
+PP at NP 0.5
+S NP VP 0.6
+VP VT NP 0.3
+VP VI 0.3
+S VP 0.2
+NP NN 0.3
+NN NP 0.2
+S S 0.1
+NP thomas 0.1
+DET the 1.0
+VT greets 0.7
+NP sally 0.1
+NN milkman 0.4
+VT walks 0.3
+VI runs 1.0
+NN milk 0.4

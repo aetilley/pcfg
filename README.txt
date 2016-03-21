@@ -50,7 +50,7 @@ Out:
 Input data has wrong signature
 Valid CFG?:   False
 
-> other_grammar.train_from_file("data/toy_univ_pcfg.txt", file_type = "UNIV_PCFG")
+> other_grammar.train_from_file("data/univ_pcfg_0.txt", file_type = "UNIV_PCFG")
 Training complete.  Running self-check...
 Valid CFG?:   True
 Valid Parameters?:   True
