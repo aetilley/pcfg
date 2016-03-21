@@ -117,12 +117,18 @@ Out:
    'tag': X0-332371785976609858},
   'tag': VP},
  'tag': S}
+ 
+################################  NEW #####################################
 
 > g1 = PCFG()
 Input data has wrong signature
 Valid CFG?:   False
 
 > g2 = PCFG()
+Input data has wrong signature
+Valid CFG?:   False
+
+> g3 = PCFG()
 Input data has wrong signature
 Valid CFG?:   False
 
@@ -138,7 +144,16 @@ Valid CFG?:   True
 Valid Parameters?:   True
 CNF?:   True
 
+> g3.train_from_file("data/toy_univ_pcfg.txt", file_type = "UNIV_PCFG")
+Training complete.  Running self-check...
+Valid CFG?:   True
+Valid Parameters?:   True
+CNF?:   True
+
 > g1 == g2
+Out: True
+
+> g2 == g3
 Out: True
 
 ***
