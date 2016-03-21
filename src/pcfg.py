@@ -166,67 +166,20 @@ class PCFG(CFG):
             
     def train_from_file(self, file_path, file_type):
         """
-        This function is meant to act on a variety of data file formats in order to
+        Available File Types:
+        UNIV_PCFG
+        UNIV_COUNTS
+        UNIV_TREE
+
+        See README.txt and derivation_example.txt for a detailed description of each file_type.
+
+        This method (while might eventually be made part of a constructor) is meant to act on
+        a variety of data file formats in order to
  
         1)  Learn the Terminals and Variables AND
         2)  Compute the transition rule set (for self.get_rules_of_arity(<arity>)) AND
         3)  Compute the q parameter for each transition rule (for self.q(<rule>)
 
-        File Types:
-
-        file_type = "UNIV_PCFG" uses the assumptions that, in any description of a PCFG:
-        1)  All variables should be the source of some rule and,
-        2)  The sources of all rules should be known variables, thus
-        in particular we find that we can  determine a PCFG
-        just by listing rules and their corresponding parameters
-        For example the following UNIV_PCFG file gives a complete description of a PCFG:
-
-        S .2
-        S S .2
-        S NP VP .6
-        NP DET NN .8
-        NP thomas .1
-        NP sally .1
-        DET the 1.
-        NN milkman 1.
-        VP VT NP .6
-        VP VI .4
-        VI runs 1.
-        VT greets 1.
-                
-        For any given line, that the first element (whitespace delimited element) is always the 
-        source of the rule in question.  
-        The last element is always the probability of the transition from this source to the targets
-        The aforementioned targests are exactly the zero or more elements between
-        the first element and the last element of the line.
-        So for example the first line above would mean a 0-ary rule with source S and targets (), 
-        and that the conditional probability of this transition to () given S is .2.
-        Note that, while a Variable (Non-terminal) may appear in the middle postions, 
-        every symbol that appears
-        in the middle and never on the left is assumed to be a Terminal.
-
-        UNIV_COUNTS file format consists of lines of the form
-
-        N SOURCE TARGETS
-
-        where N is some non-negative integer, SOURCE is (an identifier for) some 
-        source Variable or Non-terminal, 
-        and TARGETS is a list of zero or more (identifiers for) target symbols
-        (either variables or terminals).
-        The idea here is that N is the number of times the rule from this SOURCE 
-        and to these TARGETS appears in the semantic data (say a tree-bank) for our training corpus.
-        Also note that, as with UNIV_PCFG format, we do not devote separate
-        lines to listing the variables,
-        and we do not list arities of the rule for the line. There is one and only 
-        one rule per line,
-        and the arity can be read off as the length of TARGETS.
-        And once again we make the simplifying assumptions that, while Non-terminals 
-        may appear as target symbols,
-        a specific instance of a Non-terminal symbol in the semantic corpus data will 
-        always correspond to
-        an instance of a rule where that occurence of the non-terminal is the Source. 
-        Thus, in order to make a count of the total number of occurrences of a Non-terminal, 
-        we only need to sum the counts for the rules with that Non-terminal as their source.
         """
 
         #file_type: UNIV_PCFG

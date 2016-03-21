@@ -151,9 +151,9 @@ Out: True
 
 (i) UNIV_PCFG
 (ii) UNIV_COUNTS
+(iii) UNIV_TREE
 
-
-(i) file_type = "UNIV_PCFG" uses the assumptions that, in any description of a PCFG:
+(i) UNIV_PCFG uses the assumptions that, in any description of a PCFG:
 1)  All variables should be the source of some rule and,
 2)  The sources of all rules should be known variables, thus
 in particular we find that we can  determine a PCFG
@@ -187,7 +187,7 @@ Note also that every symbol that appears in the middle but never on the left can
 to be a Terminal.
 
 
-(ii) file_type = "UNIV_COUNTS" means the file format consists of lines of the form
+(ii) UNIV_COUNTS format consists of lines of the form
 
 N SOURCE TARGETS
 
@@ -210,6 +210,37 @@ always correspond to
 an instance of a rule where that occurence of the non-terminal is the Source.
 Thus, in order to make a count of the total number of occurrences of a Non-terminal,
 we only need to sum the counts for the rules with that Non-terminal as their source.
+
+
+(iii) UNIV_TREE
+
+To define UNIV_TREE format, we first define what a tree-expression is
+ a tree-expression is any character string that follows the recursive definition
+
+(i) And lone (identifier for a) Terminal
+
+<terminal>
+
+is a tree-expression (of depth zero), and in addition
+
+(ii) Given N a non-negative integer (possibly zero), and given N tree-expressions
+<tree1>, <tree2>, ... , <treeN>, of depths d1, d2, ..., dN,
+and given <symbol> a (identifier for a) Variable symbol, the character string
+
+(<symbol> <tree1> <tree2> ... <treeN>)
+
+is a tree-expression (of depth 1 + max{d1, d2, ..., dN})
+
+where we take max{} = 0 so that the tree-expression (S) has depth 1, as does, say,
+(S Damn) if Damn is in our set of Terminals.
+
+Finally, we say a file is in UNIV_TREE format, if every line consists of exactly one
+tree-expression of positive depth.
+
+
+
+
+
 
 ***
 
@@ -250,33 +281,13 @@ generally treating them as weak learners for some ensemble method.)
 
 (4)
 
-To define UNIV_TREE format, we first define what a tree-expression is
- a tree-expression is any character string that follows the recursive definition
-
-(i) And lone (identifier for a) Terminal
-
-<terminal>
-
-is a tree-expression (of depth zero)
-
-(ii) Given N a non-negative integer (possibly zero), and given N tree-expressions
-<tree1>, <tree2>, ... , <treeN>, of depths d1, d2, ..., dN,
-and given <symbol> a (identifier for a) Variable symbol, the character string
-
-(<symbol> <tree1> <tree2> ... <treeN>)
-
-is a tree-expression (of depth 1 + max{d1, d2, ..., dN})
-
-where we take max{} = 0 so that the tree-expression (S) has depth 1, as does, say,
-(S Damn) if Damn is in our set of Terminals.
-
-Finally, we say a file is in UNIV_TREE format, if every line consists of exactly one
-tree-expression of positive depth.
 ***
 
 
 
-(5) Coming soon / More Info:
+(5) Coming soon / More Info / To Do:
+
+self.parse() should output in UNIV_TREE format.
 
 
 
