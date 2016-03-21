@@ -2,8 +2,8 @@
 (1) Basic Usage
 (2) File Types understood by self.train_from_file()
 (3) A note on file types and training PCFGs.
-(4) UNIV_TREE file format
-(5) Coming Soon / More info
+
+(*) Coming Soon / More info
 
 ***
 
@@ -118,7 +118,6 @@ Out:
   'tag': VP},
  'tag': S}
 
-
 > g1 = PCFG()
 Input data has wrong signature
 Valid CFG?:   False
@@ -142,7 +141,6 @@ CNF?:   True
 > g1 == g2
 Out: True
 
-
 ***
 
 
@@ -153,7 +151,9 @@ Out: True
 (ii) UNIV_COUNTS
 (iii) UNIV_TREE
 
-(i) UNIV_PCFG uses the assumptions that, in any description of a PCFG:
+(i) UNIV_PCFG
+
+uses the assumptions that, in any description of a PCFG:
 1)  All variables should be the source of some rule and,
 2)  The sources of all rules should be known variables, thus
 in particular we find that we can  determine a PCFG
@@ -187,7 +187,9 @@ Note also that every symbol that appears in the middle but never on the left can
 to be a Terminal.
 
 
-(ii) UNIV_COUNTS format consists of lines of the form
+(ii) UNIV_COUNTS
+
+format consists of lines of the form
 
 N SOURCE TARGETS
 
@@ -238,10 +240,6 @@ Finally, we say a file is in UNIV_TREE format, if every line consists of exactly
 tree-expression of positive depth.
 
 
-
-
-
-
 ***
 
 (3) An observation about file formats and training PCFGs:
@@ -279,13 +277,8 @@ generally treating them as weak learners for some ensemble method.)
 
 ***
 
-(4)
 
-***
-
-
-
-(5) Coming soon / More Info / To Do:
+(*) Coming soon / More Info / To Do:
 
 self.parse() should output in UNIV_TREE format.
 
