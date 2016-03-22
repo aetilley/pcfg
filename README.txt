@@ -15,7 +15,7 @@
 Input data has wrong signature
 Valid CFG?:  False
 
-> grammar.train_from_file("data/toy_univ_counts.txt", file_type="UNIV_COUNTS")
+> grammar.train_from_file("data/toy_univ_tree.txt", file_type="UNIV_TREE")
 Training complete.  Running self-check...
 Valid CFG?:   True
 Valid Parameters?:   True
@@ -35,16 +35,19 @@ Applying Inside algorithm...
 Final Score:   0.024793388429752063
 Out: 0.024793388429752063
 
-> grammar.parse("Fluffy loves Fluffy")                                                           
+> tree = grammar.parse("Fluffy loves Fluffy")                                                     
 Applying CKY algorithm...
-Out: 
-{'left_branch': {'tag': NP, 'terminal': Fluffy},
- 'right_branch': {'left_branch': {'tag': VT, 'terminal': loves},
-  'right_branch': {'tag': NP, 'terminal': Fluffy},
-  'tag': VP},
- 'tag': S}
+
+> tree.label
+Out: 'S'
+
+> len(tree.children)
+Out: 2
+
+> tree.to_expr()
+Out: '(S (NP Fluffy) (VP (VT loves) (NP Fluffy)))'
  
-> grammar.write_pcfg("data/univ_pcfg_out_0.txt")
+> grammar.write_pcfg("data/toy_univ_pcfg.txt")
 
 > other_grammar = PCFG()
 Input data has wrong signature
@@ -68,7 +71,9 @@ Valid Parameters?:   True
 Out: True
 
 > other_grammar.check_CNF()
-Not CNF:  There are unary rules that do not have a Terminal as target
+Not CNF: the arity  3 is non-empty
+Not CNF:  The unary rule NN (NP,)  has as target NP
+Not CNF:  There are binary rules with targets that are not Variables
 CNF?:   False
 Out: False
 
@@ -76,8 +81,7 @@ Out: False
 This PCFG is not in Chomsky Normal Form. Cannot apply inside algorithm.
 
 > other_grammar.make_CNF()
-This process will change the underlying symbol sets
-        and rule sets of the PCFG. 
+This process will change the underlying symbol sets and rule sets of the PCFG. 
         Continue? (Enter to Continue, CTRL-C to abort.)
 
 Valid CFG?:   True
@@ -93,32 +97,31 @@ Applying Inside algorithm...
 Final Score:   0.0015844273426889994
 Out: 0.0015844273426889994
 
-> other_grammar.parse("thomas greets sally")                                                     
+> other_tree = other_grammar.parse("thomas greets sally")                                        
 Applying CKY algorithm...
-Out:
-{'left_branch': {'tag': U-thomas, 'terminal': thomas},
- 'right_branch': {'left_branch': {'tag': VT, 'terminal': greets},
-  'right_branch': {'tag': U-sally, 'terminal': sally},
-  'tag': VP},
- 'tag': S}
+
+> other_tree.label
+Out: 'S'
+
+> other_tree.terminal
+Out: False
+
+> len(other_tree.children)
+Out: 2
+
+> other_tree.to_expr()
+Out: '(S (NP thomas) (VP (VT greets) (NP sally)))'
 
 > other_grammar.score("thomas greets the milkman")
 Applying Inside algorithm...
 Final Score:   0.0033711220057212757
 Out: 0.0033711220057212757
 
-> other_grammar.parse("thomas greets the milkman")                                               
+> another_tree = other_grammar.parse("thomas greets the milkman")                                
 Applying CKY algorithm...
-Out:
-{'left_branch': {'tag': U-thomas, 'terminal': thomas},
- 'right_branch': {'left_branch': {'tag': VT, 'terminal': greets},
-  'right_branch': {'left_branch': {'tag': DET, 'terminal': the},
-   'right_branch': {'tag': NN, 'terminal': milkman},
-   'tag': X0-332371785976609858},
-  'tag': VP},
- 'tag': S}
- 
-################################  NEW #####################################
+
+> another_tree.to_expr()
+Out: '(S (NP thomas) (VP (VT greets) (NP (DET the) (U-milkman milkman))))'
 
 > g1 = PCFG()
 Input data has wrong signature
@@ -132,19 +135,22 @@ Valid CFG?:   False
 Input data has wrong signature
 Valid CFG?:   False
 
-> g1.train_from_file("data/toy_univ_counts.txt", file_type = "UNIV_COUNTS")
+> g1.train_f"data/toy_univ_pcfg.txt", file_type = "UNIV_PCFG")                                   
+g1.train_from_counts_dict  g1.train_from_file         
+
+> g1.train_from_file("data/toy_univ_pcfg.txt", file_type = "UNIV_PCFG")                          
 Training complete.  Running self-check...
 Valid CFG?:   True
 Valid Parameters?:   True
 CNF?:   True
 
-> g2.train_from_file("data/toy_univ_tree.txt", file_type = "UNIV_TREE")
+> g2.train_from_file("data/toy_univ_counts.txt", file_type = "UNIV_COUNTS")                  
 Training complete.  Running self-check...
 Valid CFG?:   True
 Valid Parameters?:   True
 CNF?:   True
 
-> g3.train_from_file("data/toy_univ_pcfg.txt", file_type = "UNIV_PCFG")
+> g3.train_from_file("data/toy_univ_tree.txt", file_type = "UNIV_TREE")
 Training complete.  Running self-check...
 Valid CFG?:   True
 Valid Parameters?:   True
@@ -155,6 +161,8 @@ Out: True
 
 > g2 == g3
 Out: True
+
+...
 
 ***
 

@@ -635,7 +635,7 @@ class PCFG(CFG):
 
     def CKY(self, symbols):
         """
-        Applies CYK algorithm to list tokens of tokens.  Returns parse tree as a dict.
+        Applies CYK algorithm to list symbols of symbols.  Returns parse tree as a dict.
         """
         N = len(symbols)
         pi = dict()
@@ -679,14 +679,19 @@ class PCFG(CFG):
 
     def recover_tree(self, bp, symbols, i, j, X):
         """Recover a parse tree from a dictionary of back-pointers."""
-        tree = dict()
-        tree['tag'] = X
+        
+        
         if i == j:
-            tree['terminal'] = symbols[i]
+            
+            expr = "(" + X.var_code + " " + symbols[i].term_code + ")"
+            return Tree(expr)
+            
         else:
             rule, cut = bp[i, j, X]
             left, right = rule.targets()
-            tree['left_branch'] = self.recover_tree(bp, symbols, i, cut, left )
-            tree['right_branch'] = self.recover_tree(bp, symbols, cut+1, j, right)
-        return tree
+            left_child = self.recover_tree(bp, symbols, i, cut, left)
+            right_child = self.recover_tree(bp, symbols, cut+1, j, right)
+            expr = "(" + X._symbol_code + " " + left_child.to_expr() + \
+                   " " + right_child.to_expr() + " )"
+            return Tree(expr)
     
