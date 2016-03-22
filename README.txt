@@ -123,6 +123,12 @@ Applying CKY algorithm...
 > another_tree.to_expr()
 Out: '(S (NP thomas) (VP (VT greets) (NP (DET the) (U-milkman milkman))))'
 
+> len(another_tree.children)
+Out: 2
+
+> another_tree.children[1].to_expr()
+Out: '(VP (VT greets) (NP (DET the) (U-milkman milkman)))'
+
 > g1 = PCFG()
 Input data has wrong signature
 Valid CFG?:   False
