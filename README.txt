@@ -135,9 +135,6 @@ Valid CFG?:   False
 Input data has wrong signature
 Valid CFG?:   False
 
-> g1.train_f"data/toy_univ_pcfg.txt", file_type = "UNIV_PCFG")                                   
-g1.train_from_counts_dict  g1.train_from_file         
-
 > g1.train_from_file("data/toy_univ_pcfg.txt", file_type = "UNIV_PCFG")                          
 Training complete.  Running self-check...
 Valid CFG?:   True
