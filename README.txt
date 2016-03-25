@@ -311,7 +311,9 @@ more generally treating them as weak learners for some ensemble method.)
 
 (*) Coming soon / More Info / To Do:
 
-self.parse() should output in UNIV_TREE format.
+Please contact Arthur with any bugs / questions / suggestions.
+
+
 
 
 

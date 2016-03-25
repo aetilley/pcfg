@@ -112,3 +112,24 @@ NP Fido 0.2727272727272727
 VT loves 0.4
 
 (This is exactly the contents of the file data/toy_univ_pcfg.txt.)
+
+The train_from_file() method is actually computing this kind of data every time it is called to train
+a new PCFG (in the case where the PCFG is trained from a counts file, it must compute MLE parameter
+estimates first, and in the case where the PCFG is trained from a tree file,
+it must read counts off of the trees. 
+
+Once a PCFG instance is properly trained, it can be used to parse other raw text.
+
+As a special case we could turn our PCFG objects parser onto the raw text from the semantic data
+that we used to train the PCFG.  We shouldn't expect that this will alway give the same parse, but it should
+often give the same parse especially in the case where we started out with a small, simple treebank.
+
+The reader might have guess correctly that, a PCFG object trained on this last UNIV_PCFG data will
+actually parse the raw corpus at the top of this file to the semantic data (treebank) just below it
+(use .parse_file(<path_to_parse>, <path_to_output_file>)).
+
+Thus the four files with filenames having prefix "toy" form a cycle: toy_univ_tree.txt, toy_univ_counts.txt,
+and toy_univ_pcfg.txt all train the exact same pcfg, and in this case if you apply the resulting pcfg
+as a parser to the raw corpus toy_raw.txt the output is exactly toy_univ_tree.txt.
+
+
