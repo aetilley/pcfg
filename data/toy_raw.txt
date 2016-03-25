@@ -1,0 +1,6 @@
+Every cat loves a dog
+Fido is a cat
+Fido is a dog
+Fluffy is a cat
+Fido loves Fluffy
+Fluffy sleeps soundly
