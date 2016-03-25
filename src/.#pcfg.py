@@ -1,1 +1,0 @@
-vagrant@debian-jessie.vagrantup.com.846:1458845174
