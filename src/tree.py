@@ -5,8 +5,8 @@ from .rule import Rule
 class Tree:
     """
     Every has a symbol and a list of zero or more children.  A node with no children 
-    (and only nodes with no children) may be "terminal" but not all nodes with no children 
-    are terminal.
+    (and only nodes with no children) may be "terminal," but not all nodes with
+    no children are terminal.
     """
     
     def __init__(self, expr):
@@ -30,7 +30,8 @@ class Tree:
             curr_expr = ""
             #l_paren_count = 1
             #r_paren_count = 0
-            paren_depth = 1 #left minus right parens.  We've passed one opening parenthesis
+            paren_depth = 1
+            #left minus right parens.  We've passed one opening parenthesis
             read_mode = False 
             rest = expr[start_index:]
             for curr_char in rest:
@@ -83,7 +84,8 @@ class Tree:
     
         
     def add_counts_return_label(self, rule_counts):
-        """Add counts for self into dictionary counts.  Return label as Variable or Terminal."""
+        """Add counts for self into dictionary rule_counts.  
+        Return label as Variable or Terminal."""
         
         if self.terminal: #Terminal (single-node) trees have no occurences of Rules)
             return Terminal(self.label)

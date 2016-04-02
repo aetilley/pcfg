@@ -267,18 +267,17 @@ is a tree-expression (of depth 1 + max{d1, d2, ..., dN})
 where we take max{} = 0 so that the tree-expression (S) has depth 1, as does, say,
 (S Damn) if Damn is in our set of Terminals.
 
-Finally, we say a file is in UNIV_TREE format, if every line consists of exactly one
+Finally, we say a file is in UNIV_TREE format if every line consists of exactly one
 tree-expression of positive depth.
-
 
 ***
 
 (3) An observation about file formats and training PCFGs:
 
 
-Notice that any file that could hope to uniquely train a complete PCFG object must determine a file
-in UNIV_PCFG format, and in this way UNIV_PCFG is a kind of universal receiver for training data
-set representations.
+Notice that any file that could hope to uniquely train a complete PCFG object
+must determine a file in UNIV_PCFG format, and in this way UNIV_PCFG is a kind of
+universal receiver for training data set representations.
 
 In practice however, most data that we do obtain in UNIV_PCFG format will have come from some
 sort of "counts file" at some point in its creation by way of MLE parameter estimates.
@@ -303,18 +302,14 @@ local format and outputs a counts file or another tree-bank (see UNIV_COUNTS and
 
 The second alternative is to use yet another parser on our corpus to get sufficient
 semantic information to write your counts file.
-(It might be interesting to experiment with boosting PCFG objects or
+(It might be interesting to experiment with boosting with these PCFG objects or
 more generally treating them as weak learners for some ensemble method.)
 
 ***
 
-
 (*) Coming soon / More Info / To Do:
 
-Please contact Arthur with any bugs / questions / suggestions.
 
 
 
-
-
-(contact aetilley at gmail dot com)
+bugs / questions / suggestions ? contact aetilley at gmail dot com
