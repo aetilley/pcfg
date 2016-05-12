@@ -10,7 +10,7 @@ Raw corpus:
 
 If we're luckly, our raw corpus has associated
 
-Semantic Data (Tagged and Parsed):
+Syntactic Data (Tagged and Parsed):
 
 (S (NP (DET Every) (NN cat)) (VP (VT loves) (NP (DET a) (NN dog))))
 (S (NP Fido) (VP (VT is) (NP (DET a) (NN cat))))
@@ -19,11 +19,11 @@ Semantic Data (Tagged and Parsed):
 (S (NP Fido) (VP (VT loves) (NP Fluffy)))
 (S (NP Fluffy) (VP (VI sleeps) (ADV soundly)))
 
-(the above semantic data is exactly the contents of data/toy_univ_tree.txt)
+(the above parse data is exactly the contents of data/toy_univ_tree.txt)
 
-(If your raw data does not have associated semantic data, you need to either parse the raw data by hand or use another parser.)
+(If your raw data does not have associated parse data, you need to either parse the raw data by hand or use another parser.)
 
-Once we have the semantic data, we can compute rule counts line by line:
+Once we have the parse data, we can compute rule counts line by line:
 
 1) (S, (NP, VP)): 1, (NP, (DET, NN)): 2, (VP, (VT, NP)): 1,
 (DET, (Every,)): 1, (NN, (cat,)): 1, (VT, (loves,)): 1, (DET, (a,)): 1, (NN, (dog,)): 1
@@ -120,13 +120,13 @@ it must read counts off of the trees.
 
 Once a PCFG instance is properly trained, it can be used to parse other raw text.
 
-As a special case we could turn our PCFG objects parser onto the raw text from the semantic data
+As a special case we could turn our PCFG objects parser onto the raw text from the syntactic data
 that we used to train the PCFG.  We shouldn't expect that this will alway give the same parse,
 but it should often give the same parse especially in the case where we started out with a
 small, simple treebank.
 
 The reader might have guess correctly that, a PCFG object trained on this last UNIV_PCFG data will
-actually parse the raw corpus at the top of this file to the semantic data (treebank) just below it
+actually parse the raw corpus at the top of this file to the parse data (treebank) just below it
 (use .parse_file(<path_to_parse>, <path_to_output_file>)).
 
 Thus the four files with filenames having prefix "toy" form a cycle:

@@ -233,14 +233,14 @@ and TARGETS is a list of zero or more (identifiers for) target symbols
 (either variables or terminals).
 The idea here is that N is the number of times the rule from this SOURCE and to
 these TARGETS appears
-in the semantic data (say a tree-bank) for our training corpus.
+in the syntactic data (say a tree-bank) for our training corpus.
 
 Also note that, as with UNIV_PCFG format, we do not devote separate lines to
 listing the variables, and we do not list arities of the rule for the line.
 There is one and only one rule per line,
 and the arity can be read off as the length of TARGETS. And once again we make the
 simplifying assumptions that, while Non-terminals may appear as target symbols, a specific
-instance of a Non-terminal symbol in the semantic corpus data will always correspond to
+instance of a Non-terminal symbol in the syntactic corpus data will always correspond to
 an instance of a rule where that occurence of the non-terminal is the Source.
 Thus, in order to make a count of the total number of occurrences of a Non-terminal,
 we only need to sum the counts for the rules with that Non-terminal as their source.
@@ -265,7 +265,8 @@ and given <symbol> a (identifier for a) Variable symbol, the character string
 is a tree-expression (of depth 1 + max{d1, d2, ..., dN})
 
 where we take max{} = 0 so that the tree-expression (S) has depth 1, as does, say,
-(S Damn) if Damn is in our set of Terminals.
+(S Damn) if Damn is in our set of Terminals.  Notice in particular that there is no empty
+tree-expression (even though we may allow the empty string as raw text).
 
 Finally, we say a file is in UNIV_TREE format if every line consists of exactly one
 tree-expression of positive depth.
@@ -281,16 +282,20 @@ universal receiver for training data set representations.
 
 In practice however, most data that we do obtain in UNIV_PCFG format will have come from some
 sort of "counts file" at some point in its creation by way of MLE parameter estimates.
+Furthermore, this counts file will have been computed, at some point, from
+some parsed collection of text (a tree-bank).
 
-See derivation_example.txt for a simple example of how a counts file might be generated.
+See derivation_example.txt for a simple example of how a counts file might be generated from a
+tree-bank file, and how a UNIV_PCFG file might be computed from a counts file.
+
 Whatever the details...at some point after we obtained a training corpus,
-since it is not enought to have a raw training corpus
+since it is not enough to have a raw training corpus
 
-(1) a choice must be made about legal rules; we can call the subset of allowable rules
-the *signature* of the PCFG (consider for instance the CNF restrictions).
-But even with our signature selected,
+(1) a choice must be made about admissible transition rules for the grammar;
+we can call the subset of allowable rules the *signature* of the PCFG (consider for instance
+the CNF restrictions). But even with our signature selected,
 
-(2) We need semantic (parse) information about the raw corpus sufficient to
+(2) We need parse information about the raw corpus sufficient to
 record counts for all the rules in our signature.
 
 In order to do (2), there are really only two options.
@@ -301,13 +306,15 @@ From this it should not be too hard to write a program that reads this treebank 
 local format and outputs a counts file or another tree-bank (see UNIV_COUNTS and UNIV_TREE formats).
 
 The second alternative is to use yet another parser on our corpus to get sufficient
-semantic information to write your counts file.
+syntactic information to write your counts file.
 (It might be interesting to experiment with boosting with these PCFG objects or
 more generally treating them as weak learners for some ensemble method.)
 
 ***
 
 (*) Coming soon / More Info / To Do:
+
+Dealing with new / unknown tokens.
 
 
 

@@ -155,7 +155,7 @@ class CFG:
             if key not in {1, 2}:
                 if len(self._n_ary_rules[key]) != 0:
                     result = False
-                    print("Not CNF: the arity ", key, "is non-empty")
+                    print("Not CNF:  The arity", key, "is non-empty")
                 
         for unary_rule in self.unary_rules():
             unary_check = type(unary_rule.target(0)) is Terminal
