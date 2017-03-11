@@ -1,3 +1,5 @@
+[NOTE:  This library was developed before the author was familiar with the nltk library, in particular the nltk.grammar module.
+The author would suggest that anyone interested in using PCFGs in production consult these (more robust) libraries first.]
 
 (1) Basic Usage
 (2) File Types understood by self.train_from_file()
